@@ -10,15 +10,19 @@ class StoreListSerializer(serializers.ModelSerializer):
             "user_id",
             "hanbok_store",
             "hanbok_address",
+            "location_x",
+            "location_y",
             "star",
         )
 
 
-class StoreCreateSerializer(serializers.ModelSerializer):
+class CreateStoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Store
         fields = (
             "hanbok_store",
             "hanbok_address",
+            "location_x",
+            "location_y",
             "star",
         )
