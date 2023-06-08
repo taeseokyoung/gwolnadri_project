@@ -9,9 +9,4 @@ urlpatterns = [
         views.EventReviewView.as_view(),
         name="event_review_view",
     ),
-    path(
-        "<int:event_id>/<int:eventreview_id>",
-        views.EventReviewDetailView.as_view(),
-        name="event_review_detail_view",
-    ),
 ]
