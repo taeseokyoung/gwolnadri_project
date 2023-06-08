@@ -34,3 +34,33 @@ class Event(models.Model):
     time_slots = models.JSONField()
     max_booking = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     money = models.IntegerField()
+
+
+class EventReview(models.Model):
+    """
+    해당 공연정보에 담긴 리뷰를 보여줍니다.
+    author(Foreignkey) 해당 리뷰를 작성한 작성자
+    event(Foreignkey) 해당 리뷰의 대상이 된 행사정보
+    content(text) 리뷰의 내용
+    review_image(image) 리뷰에 입력된 이미지
+    created_at(date) 생성날짜
+    updated_at(date) 수정시간
+    grade(int choice) 해당 행사의 평점을 나타내며, 1~5점을 줄 수 있습니다.
+    """
+
+    RATING_CHOICES = [
+        (1, "1점"),
+        (2, "2점"),
+        (3, "3점"),
+        (4, "4점"),
+        (5, "5점"),
+    ]
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    event = models.ForeignKey(
+        Event, on_delete=models.CASCADE, related_name="review_set"
+    )
+    content = models.TextField()
+    review_image = models.ImageField(blank=True, upload_to="%Y/%m/")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    grade = models.IntegerField(choices=RATING_CHOICES)

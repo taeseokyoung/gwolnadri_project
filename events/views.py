@@ -1,16 +1,17 @@
 from rest_framework import status, permissions
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
-from events.models import Event
+from events.models import Event, EventReview
 from events.permissons import CustomPermission
 from events.serializers import (
     EventCreateSerializer,
     EventSerializer,
     EventListSerializer,
     EventEditSerializer,
+    EventReviewSerializer,
+    EventReviewCreateSerializer,
 )
 
 
@@ -90,3 +91,41 @@ class EventDetailView(APIView):
         self.check_object_permissions(self.request, event)
         event.delete()
         return Response({"message": "삭제완료"}, status=status.HTTP_200_OK)
+
+
+class EventReviewView(generics.ListCreateAPIView):
+    """
+    GET
+    event_id를 사용하여 해당 id의 공연정보에 담긴 리뷰를 불러옵니다
+    리뷰는 최신순으로 정렬하여 출력됩니다
+
+    POST
+    event_id를 사용하여 해당 id의 공연정보에 리뷰를 추가합니다
+    인증은 context를 이용하며, 작성한 내용에 문제가 없을 시
+    "작성완료"메시지와 상태메시지 200을 출력합니다
+    입력값의 형태가 잘못되었을 시 상태메시지 400을 출력합니다.
+    """
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = EventReviewSerializer
+    queryset = None
+
+    def get(self, request, *args, **kwargs):
+        reviews = (
+            get_object_or_404(Event, id=kwargs.get("event_id"))
+            .review_set.all()
+            .order_by("-created_at")
+        )
+        self.queryset = reviews
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        serializer = EventReviewCreateSerializer(
+            data=request.data, context={"request": request}
+        )
+        event = get_object_or_404(Event, id=kwargs.get("event_id"))
+        if serializer.is_valid():
+            serializer.save(author=request.user, event=event)
+            return Response({"message": "작성완료"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
