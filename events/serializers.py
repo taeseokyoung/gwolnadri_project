@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from events.models import Event
+from events.models import Event, EventReview
 
 
 class EventCreateSerializer(serializers.ModelSerializer):
@@ -35,12 +35,17 @@ class EventSerializer(serializers.ModelSerializer):
     게시글의 모든 정보를 보여주기 위해 사용됩니다.
 
     format을 사용하여 created_at의 출력형태를 제어합니다.
+    review_count는 해당 행사정보에 담긴 리뷰의 수를 나타냅니다.
     """
 
     created_at = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
     updated_at = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
     event_start_date = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
     event_end_date = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
+    review_count = serializers.SerializerMethodField()
+
+    def get_review_count(self, obj):
+        return obj.review_set.count()
 
     class Meta:
         model = Event
@@ -51,6 +56,7 @@ class EventListSerializer(EventSerializer):
     """EventListSerializer: Event의 간단한 정보
 
     Event의 일부 정보만 조회하여 목록을 형성할 때 사용합니다.
+    review_count는 해당 행사정보에 담긴 리뷰의 수를 나타냅니다.
     """
 
     class Meta:
@@ -63,6 +69,7 @@ class EventListSerializer(EventSerializer):
             "title",
             "event_start_date",
             "event_end_date",
+            "review_count",
         )
 
 
@@ -90,3 +97,31 @@ class EventEditSerializer(serializers.ModelSerializer):
             )
 
         return attrs
+
+
+class EventReviewSerializer(serializers.ModelSerializer):
+    """
+    리뷰를 조회하기 위해 사용됩니다.
+    """
+
+    created_at = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
+    updated_at = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
+
+    class Meta:
+        model = EventReview
+        fields = "__all__"
+
+
+class EventReviewCreateSerializer(serializers.ModelSerializer):
+    """
+    리뷰를 생성하기 위해 사용됩니다.
+    content(text)
+    grade(intchoice)
+    """
+
+    class Meta:
+        model = EventReview
+        fields = (
+            "content",
+            "grade",
+        )
