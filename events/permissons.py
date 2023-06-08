@@ -15,19 +15,3 @@ class CustomPermission(permissions.BasePermission):
             return True
         else:
             return request.user.is_admin
-
-
-class IsOwnerOrReadOnly(permissions.BasePermission):
-    """
-    오브젝트의 생성자가 요청자와 같은 경우, 생성, 수정, 삭제 권한을 부여
-    생성자와 요청자가 다를 때에는 읽기 권한만 부여
-    """
-
-    message = "권한이 없습니다"
-
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        # Instance must have an attribute named `owner`.
-        return obj.author == request.user

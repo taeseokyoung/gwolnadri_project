@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 from events.models import Event, EventReview
-from events.permissons import CustomPermission, IsOwnerOrReadOnly
+from events.permissons import CustomPermission
 from events.serializers import (
     EventCreateSerializer,
     EventSerializer,
@@ -129,34 +129,3 @@ class EventReviewView(generics.ListCreateAPIView):
             return Response({"message": "작성완료"}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class EventReviewDetailView(APIView):
-    """
-    permission을 주어, 인증여부를 판단하며, IsOwnerOrReadOnly을 사용하여, 리뷰 생성자와 요청자를 확인합니다.
-    PUT
-    eventreview_id를 사용하여, 해당 id의 리뷰를 수정합니다
-    수정이 잘 이루어지면, "수정완료"메시지와 상태메시지 200을 출력합니다
-    입력값이 잘못되면, 상태메시지 400을 출력합니다
-    DELETE
-    eventreview_id를 사용하여 해당 id의 리뷰를 삭제합니다
-    삭제가 잘 이루어지면, "삭제완료"메시지와 상태메시지 204를 출력합니다.
-    """
-
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-
-    def put(self, request, **kwargs):
-        review = get_object_or_404(EventReview, id=kwargs.get("eventreview_id"))
-        serializer = EventReviewCreateSerializer(review, data=request.data)
-        self.check_object_permissions(self.request, review)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "수정완료"}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, **kwargs):
-        review = get_object_or_404(EventReview, id=kwargs.get("eventreview_id"))
-        self.check_object_permissions(self.request, review)
-        review.delete()
-        return Response({"message": "삭제완료"}, status=status.HTTP_204_NO_CONTENT)
