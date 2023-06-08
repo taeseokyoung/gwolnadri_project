@@ -9,7 +9,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # env 설정 : SECRET_KEY, DB
 
 env = environ.Env(DEBUG=(bool, False))
+env = environ.Env(DEBUG=(bool, False))
 
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 
@@ -31,6 +33,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
     "events",
@@ -41,6 +44,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -49,9 +53,19 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "config.urls"
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [],
         "APP_DIRS": True,
