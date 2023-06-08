@@ -5,9 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Store(models.Model):
     user_id = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="stores",
+        User, on_delete=models.CASCADE, related_name="stores", null=True
     )
     hanbok_store = models.CharField(max_length=255)
     hanbok_address = models.CharField(max_length=255)  # 변경 필요

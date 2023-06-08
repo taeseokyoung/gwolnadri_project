@@ -22,7 +22,7 @@ class CreateStoreSerializer(serializers.ModelSerializer):
         fields = (
             "hanbok_store",
             "hanbok_address",
-            "location_x",
-            "location_y",
+            # location_x,
+            # location_y,
             "star",
         )
