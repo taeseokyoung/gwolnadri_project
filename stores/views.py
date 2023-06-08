@@ -4,17 +4,6 @@ from rest_framework.response import Response
 from .models import Store
 from .serializers import StoreListSerializer, CreateStoreSerializer
 
-import requests, json
-import os
-import environ
-
-
-def get_location(address):
-    url = "https://dapi.kakao.com/v2/local/search/address.json?query=" + address
-    headers = {"Authorization": os.environ.get("KakaoAK")}
-    api_json = json.loads(str(requests.get(url, headers=headers).text))
-    return api_json
-
 
 # 한복집 리스트
 class StoreListView(APIView):
@@ -24,7 +13,7 @@ class StoreListView(APIView):
 
         return Response(
             {
-                "articles": store_serializer.data,
+                "Store List": store_serializer.data,
             },
             status=status.HTTP_200_OK,
         )
@@ -32,11 +21,12 @@ class StoreListView(APIView):
     def post(self, request):
         data = request.data
         serializer = CreateStoreSerializer(data=data)
-        # location_x = get_location(data["hanbok_address"])["documents"][0]["x"]
-        # location_y = get_location(data["hanbok_address"])["documents"][0]["y"]
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "한복집리스트"}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "한복집추가완료", "data": serializer.data},
+                status=status.HTTP_200_OK,
+            )
         else:
             return Response(
                 {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST
