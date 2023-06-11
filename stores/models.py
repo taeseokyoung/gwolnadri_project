@@ -58,13 +58,15 @@ class Hanbok(models.Model):
         on_delete=models.CASCADE,
         related_name="products",
         verbose_name="한복점_Id",
-        # null=True,  # -------나중에 지우기
     )
 
     hanbok_name = models.CharField("제품명", max_length=255)
     hanbok_description = models.TextField("제품설명")
     hanbok_price = models.PositiveIntegerField("가격")
     # hanbok_image = models.ImageField(blank=True, upload_to="%Y/%m/")
+
+    def __str__(self):
+        return self.hanbok_name
 
 
 class HanbokImage(models.Model):
@@ -79,4 +81,4 @@ class HanbokImage(models.Model):
     """
 
     hanbok_id = models.ForeignKey(Hanbok, on_delete=models.CASCADE)
-    hanbok_image = models.ImageField(upload_to="hanbok_id", blank=True, null=True)
+    hanbok_image = models.ImageField(blank=True, null=True, upload_to="hanbok/%Y/%m/")
