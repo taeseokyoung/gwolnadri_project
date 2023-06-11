@@ -1,13 +1,19 @@
-from rest_framework import status, permissions
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from .models import Store, Hanbok
 from .serializers import StoreListSerializer, CreateStoreSerializer, HanbokSerializer
 
+# from .permissons import IsOwnerOrReadOnly
+
 
 # 한복집 리스트
 class StoreListView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
     def get(self, request):
         store = Store.objects.all()
         store_serializer = StoreListSerializer(store, many=True)
@@ -21,9 +27,10 @@ class StoreListView(APIView):
 
     def post(self, request):
         data = request.data
+        print(request.user)
         serializer = CreateStoreSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(owner_id=request.user)
             return Response(
                 {"message": "한복집추가완료", "data": serializer.data},
                 status=status.HTTP_200_OK,
@@ -39,6 +46,8 @@ class StoreDetailView(APIView):
     """
     해당 한복집의 정보와 등록한 한복 상품 정보 노출
     """
+
+    # permission_classes = [IsOwnerOrReadOnly]
 
     def get(self, request, store_id):
         store = get_object_or_404(Store, id=store_id)
@@ -58,7 +67,7 @@ class StoreDetailView(APIView):
         data = request.data
         serializer = HanbokSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(owner_id=request.user)
             return Response(
                 {"message": "한복 추가 완료", "data": serializer.data},
                 status=status.HTTP_200_OK,

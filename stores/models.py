@@ -23,7 +23,6 @@ class Store(models.Model):
         on_delete=models.CASCADE,
         related_name="stores",
         verbose_name="오너_Id",
-        null=True,  # -------나중에 지우기
     )
     store_name = models.CharField("상점이름", max_length=50)
     store_address = models.CharField("상점주소", max_length=255)
@@ -51,6 +50,7 @@ class Hanbok(models.Model):
     hanbok_name (varChar): 제품명, 255자 제한
     hanbok_description (varChar): 제품설명
     hanbok_price (positiveInt): 가격
+    hanbok_image (Image) : 제품별 이미지 1장 (media/hanbok 폴더에 저장)
     """
 
     store_id = models.ForeignKey(
@@ -67,18 +67,3 @@ class Hanbok(models.Model):
 
     def __str__(self):
         return self.hanbok_name
-
-
-# class HanbokImage(models.Model):
-
-#     """HanbokImage 모델
-
-#     한복 상품 이미지를 담습니다.
-
-#     Attributes:
-#     hanbok_id (Foreignkey): hanbok_id(한복상품 id)의 값을 가집니다
-#     hanbok_image (Image): 다중 이미지 업로드 가능
-#     """
-
-#     hanbok_id = models.ForeignKey(Hanbok, on_delete=models.CASCADE)
-#     hanbok_image = models.ImageField(blank=True, null=True, upload_to="hanbok/%Y/%m/")
