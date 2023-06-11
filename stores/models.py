@@ -63,22 +63,22 @@ class Hanbok(models.Model):
     hanbok_name = models.CharField("제품명", max_length=255)
     hanbok_description = models.TextField("제품설명")
     hanbok_price = models.PositiveIntegerField("가격")
-    # hanbok_image = models.ImageField(blank=True, upload_to="%Y/%m/")
+    hanbok_image = models.ImageField(blank=True, upload_to="hanbok")
 
     def __str__(self):
         return self.hanbok_name
 
 
-class HanbokImage(models.Model):
+# class HanbokImage(models.Model):
 
-    """HanbokImage 모델
+#     """HanbokImage 모델
 
-    한복 상품 이미지를 담습니다.
+#     한복 상품 이미지를 담습니다.
 
-    Attributes:
-    hanbok_id (Foreignkey): hanbok_id(한복상품 id)의 값을 가집니다
-    hanbok_image (Image): 다중 이미지 업로드 가능
-    """
+#     Attributes:
+#     hanbok_id (Foreignkey): hanbok_id(한복상품 id)의 값을 가집니다
+#     hanbok_image (Image): 다중 이미지 업로드 가능
+#     """
 
-    hanbok_id = models.ForeignKey(Hanbok, on_delete=models.CASCADE)
-    hanbok_image = models.ImageField(blank=True, null=True, upload_to="hanbok/%Y/%m/")
+#     hanbok_id = models.ForeignKey(Hanbok, on_delete=models.CASCADE)
+#     hanbok_image = models.ImageField(blank=True, null=True, upload_to="hanbok/%Y/%m/")
