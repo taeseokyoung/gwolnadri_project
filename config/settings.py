@@ -7,14 +7,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # env 설정 : SECRET_KEY, DB
-
 env = environ.Env(DEBUG=(bool, False))
-
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 
 # env 설정 : SECRET_KEY
-
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = True
@@ -23,7 +20,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -31,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
     "events",
@@ -41,6 +38,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -66,11 +64,11 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = "config.wsgi.application"
 
 
 # Database = postgresql 12 / env
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -85,25 +83,14 @@ DATABASES = {
 
 
 # Password validation
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
 
 # Internationalization
-
 LANGUAGE_CODE = "ko-kr"
 
 TIME_ZONE = "Asia/Seoul"
@@ -114,29 +101,25 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-
 STATIC_URL = "static/"
 
 
 # media
-
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
 
 # Default primary key field type
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # auth user
-
 AUTH_USER_MODEL = "users.User"
 
 
 # rest_framework and simple jwt
-
 from datetime import timedelta
+
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
