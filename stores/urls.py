@@ -10,4 +10,9 @@ urlpatterns = [
         views.PurchaseRecordView.as_view(),
         name="purchase_record",
     ),
+    path(
+        "payment/<tid>/",
+        views.PutPurchaseRecordView.as_view(),
+        name="put_purchase_record",
+    ),
 ]

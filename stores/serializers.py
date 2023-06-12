@@ -74,3 +74,10 @@ class PurchaseRecordCreateSerializer(serializers.ModelSerializer):
             "aid",
             "approved_at",
         ]
+
+
+# 결제 정보 조회용 Serializer
+class PurchaseRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PurchaseRecord
+        fields = "__all__"
