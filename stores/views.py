@@ -1,8 +1,12 @@
 from rest_framework import status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Store
-from .serializers import StoreListSerializer, CreateStoreSerializer
+from .models import Store, PurchaseRecord
+from .serializers import (
+    StoreListSerializer,
+    CreateStoreSerializer,
+    PurchaseRecordCreateSerializer,
+)
 
 
 # 한복집 리스트
@@ -37,3 +41,22 @@ class StoreListView(APIView):
 class StoreDetailView(APIView):
     def get(self, request):
         pass
+
+
+# 결제 승인요청
+class PurchaseRecordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, user_id):
+        decomplete = PurchaseRecord.objects.filter(
+            user_id=user_id, approved_at__isnull=True
+        )
+        if decomplete.exists():
+            decomplete.delete()
+        serializer = PurchaseRecordCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response({"message": "db 저장완료"}, status=status.HTTP_200_OK)
+        else:
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
