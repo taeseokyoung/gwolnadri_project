@@ -35,6 +35,14 @@ class Event(models.Model):
     max_booking = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     money = models.IntegerField()
 
+class Ticket(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event_date = models.DateField()
+    event_time = models.CharField(max_length=11)
+    ticket_status = models.BooleanField(default=True)
+    booked_users = models.ManyToManyField(User, related_name="booked_tickets")
+    current_booking = models.PositiveIntegerField(default=0)
 
 class EventReview(models.Model):
     """
