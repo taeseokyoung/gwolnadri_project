@@ -56,8 +56,3 @@ class User(AbstractBaseUser):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
-
-
-class Verify(models.Model):
-    email = models.EmailField()
-    athnt_code = models.CharField(max_length=6)
