@@ -70,29 +70,6 @@ class Hanbok(models.Model):
     def __str__(self):
         return self.hanbok_name
 
-# class HanbokStore(models.Model):
-#     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-#     hanbok_store = models.CharField(max_length=20)
-
-#     def __str__(self):
-#         return self.hanbok_store
-
-
-# class Hanbok(models.Model):
-#     store_name = models.ForeignKey(
-#         HanbokStore, on_delete=models.CASCADE, related_name="hanbok_list"
-#     )
-#     hanbok_owner = models.ForeignKey(User, on_delete=models.CASCADE)
-#     hanbok_name = models.CharField(
-#         max_length=20,
-#     )
-#     hanbok_description = models.CharField(max_length=100)
-#     hanbok_price = models.IntegerField()
-#     hanbok_image = models.ImageField(upload_to="media/stores/%m/")
-
-#     def __str__(self):
-#         return self.hanbok_name
-
 
 class PurchaseRecord(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
