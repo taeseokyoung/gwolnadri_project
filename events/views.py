@@ -1,8 +1,8 @@
-from rest_framework import status, permissions
+from rest_framework import status, permissions, generics, viewsets
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
-from rest_framework import generics
 from rest_framework.generics import get_object_or_404
+from rest_framework.filters import SearchFilter
 from events.models import Event, EventReview
 from events.permissons import CustomPermission, IsOwnerOrReadOnly
 from events.serializers import (
@@ -160,3 +160,13 @@ class EventReviewDetailView(APIView):
         self.check_object_permissions(self.request, review)
         review.delete()
         return Response({"message": "삭제완료"}, status=status.HTTP_204_NO_CONTENT)
+
+
+# 행사 검색기능
+class EventSearchViewSet(viewsets.ModelViewSet):
+    events = Event.objects.all()
+    # 검색기반 serializer. 변경하셔도 괜찮습니다
+    serializer = EventListSerializer
+
+    filter = [SearchFilter]
+    search_fields = ("title",)
