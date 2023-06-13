@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework import permissions
 
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
@@ -20,7 +20,7 @@ class StoreListView(APIView):
     모든 한복집 리스트 -> 궁별 한복집 리스트로 변경할 예정
     """
 
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request):
         store = Store.objects.all()
@@ -59,7 +59,7 @@ class StoreDetailView(APIView):
     해당 한복집의 정보와 등록한 한복 상품 정보 노출
     """
 
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request, store_id):
         store = get_object_or_404(Store, id=store_id)
@@ -102,21 +102,6 @@ class StoreDetailView(APIView):
                 {"message": "권한이 없거나 잘못된 요청입니다."}, status=status.HTTP_403_FORBIDDEN
             )
 
-          
-    # # class StaffOnlyStoreView(APIView):
-    """
-        만약에 접속자의 스토어 중에 접속한 스토어 아이디가 없으면? - 거절
-        접속자 :  request.user
-        스토어 아이디 : store_id
-        접속자의 스토어 : stores = Store.object.filter(owner=request.user)
-        접속자의 스토어의 아이디?:
-    """
-
-
-#         hanboks = Hanbok.objects.filter(
-#             store=store_id
-#         )  # ____여기수정owner=request.user : 내가 추가한 상품만 노출됨
-
 
 # 결제 승인요청
 class PurchaseRecordView(APIView):
@@ -124,7 +109,7 @@ class PurchaseRecordView(APIView):
 
     def get(self, request):
         pass
-    
+
     def post(self, request, user_id):
         decomplete = PurchaseRecord.objects.filter(
             user_id=user_id, approved_at__isnull=True
