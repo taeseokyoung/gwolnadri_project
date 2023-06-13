@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import Store, Hanbok
-
+from .models import Store, Hanbok, PurchaseRecord
 import requests, json
 import os
 import environ
@@ -47,7 +46,7 @@ class CreateStoreSerializer(serializers.ModelSerializer):
             "store_address",
         )
 
-    # 한복집 x,y좌표 | 별점(후기없는경우 0) 추가
+    # ✅ 한복집 x,y좌표 | 별점(후기없는경우 0) 추가
     def create(self, validated_data):
         location_result = get_location(validated_data["store_address"])
         print(validated_data)
@@ -99,28 +98,29 @@ class CreateHanbokSerializer(serializers.ModelSerializer):
         ]
 
 
-# class CreateHanbokSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Hanbok
-#         fields = (
-#             "hanbok_name",
-#             "hanbok_description",
-#             "hanbok_price",
-#             "hanbok_image",
-#         )
+# 결제 정보 기록용 Serializer
+class PurchaseRecordCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PurchaseRecord
+        fields = [
+            "tid",
+            "partner_order_id",
+            "partner_user_id",
+            "item_name",
+            "quantity",
+            "total_amount",
+            "vat_amount",
+            "rsrvt_date",
+            "rsrvt_time",
+            "created_at",
+            "payment_method_type",
+            "aid",
+            "approved_at",
+        ]
 
-#     # context={"select": request.query_params.get("select", None)
-#     # print("프린트프린프 : ", Store.objects.filter(id=7))
 
-#     def create(self, validated_data):
-#         hanbok = Hanbok.objects.create(
-#             # store_id=Store.objects.filter(id=validated_data["store_id"]).id,
-#             store_id=validated_data["store_id"],
-#             hanbok_name=validated_data["hanbok_name"],
-#             hanbok_description=validated_data["hanbok_description"],
-#             hanbok_price=validated_data["hanbok_price"],
-#             hanbok_image=validated_data["hanbok_image"],
-#         )
-#         # print(hanbok)
-#         hanbok.save()
-#         return hanbok
+# 결제 정보 조회용 Serializer
+class PurchaseRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PurchaseRecord
+        fields = "__all__"

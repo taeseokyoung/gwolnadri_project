@@ -1,8 +1,8 @@
-from rest_framework import status, permissions
+from rest_framework import status, permissions, generics
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
-from rest_framework import generics
 from rest_framework.generics import get_object_or_404
+from rest_framework import filters
 from events.models import Event, EventReview
 from events.permissons import CustomPermission, IsOwnerOrReadOnly
 from events.serializers import (
@@ -20,7 +20,7 @@ class EventView(generics.ListCreateAPIView):
     """EventView
     GET:
     행사정보 전체를 볼 수 있습니다.
-    generics를 사용하여, GET요청은  queryse사용하여, 따로 만들지 않았습니다.
+    generics를 사용하여, GET요청은  queryset사용하여, 따로 만들지 않았습니다.
 
     POST:
     행사정보를 생성할 수 있습니다.
@@ -35,6 +35,10 @@ class EventView(generics.ListCreateAPIView):
     ]
     serializer_class = EventListSerializer
     queryset = Event.objects.all()
+    filter_backends = [filters.SearchFilter]
+    search_fields = [
+        "title",
+    ]
 
     def post(self, request, *args, **kwargs):
         serializer = EventCreateSerializer(data=request.data)
