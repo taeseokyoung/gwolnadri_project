@@ -5,4 +5,14 @@ from stores import views
 urlpatterns = [
     path("", views.StoreListView.as_view(), name="store_list"),
     path("<int:hanbok_id>/", views.StoreDetailView.as_view(), name="store_detail_view"),
+    path(
+        "payment/<int:user_id>/",
+        views.PurchaseRecordView.as_view(),
+        name="purchase_record",
+    ),
+    path(
+        "payment/<tid>/",
+        views.PutPurchaseRecordView.as_view(),
+        name="put_purchase_record",
+    ),
 ]

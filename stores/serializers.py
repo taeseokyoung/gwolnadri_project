@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Store
+from .models import Store, PurchaseRecord
 
 import requests, json
 import os
@@ -53,3 +53,31 @@ class CreateStoreSerializer(serializers.ModelSerializer):
         )
         store.save()
         return store
+
+
+# 결제 정보 기록용 Serializer
+class PurchaseRecordCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PurchaseRecord
+        fields = [
+            "tid",
+            "partner_order_id",
+            "partner_user_id",
+            "item_name",
+            "quantity",
+            "total_amount",
+            "vat_amount",
+            "rsrvt_date",
+            "rsrvt_time",
+            "created_at",
+            "payment_method_type",
+            "aid",
+            "approved_at",
+        ]
+
+
+# 결제 정보 조회용 Serializer
+class PurchaseRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PurchaseRecord
+        fields = "__all__"
