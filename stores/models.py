@@ -18,14 +18,14 @@ class Store(models.Model):
     star (positiveInt): 별점 1~5 값                -----**평균별점값으로 변경필요!!----
     """
 
-    owner_id = models.ForeignKey(
+    owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="stores",
-        verbose_name="오너_Id",
+        verbose_name="판매자",
     )
     store_name = models.CharField("상점이름", max_length=50)
-    store_address = models.CharField("상점주소", max_length=255)
+    store_address = models.CharField("상점주소", max_length=255, unique=True)
     location_x = models.FloatField("x좌표", blank=True, null=True)
     location_y = models.FloatField("y좌표", blank=True, null=True)
     star = models.PositiveIntegerField(
@@ -53,17 +53,20 @@ class Hanbok(models.Model):
     hanbok_image (Image) : 제품별 이미지 1장 (media/hanbok 폴더에 저장)
     """
 
-    store_id = models.ForeignKey(
+    store = models.ForeignKey(
         Store,
         on_delete=models.CASCADE,
         related_name="products",
-        verbose_name="한복점_Id",
+        verbose_name="한복점",
     )
-
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
     hanbok_name = models.CharField("제품명", max_length=255)
     hanbok_description = models.TextField("제품설명")
     hanbok_price = models.PositiveIntegerField("가격")
-    hanbok_image = models.ImageField(blank=True, upload_to="hanbok")
+    hanbok_image = models.ImageField("제품이미지", blank=True, null=True, upload_to="hanbok")
 
     def __str__(self):
         return self.hanbok_name

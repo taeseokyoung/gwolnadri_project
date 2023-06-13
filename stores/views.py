@@ -5,13 +5,20 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from .models import Store, Hanbok
-from .serializers import StoreListSerializer, CreateStoreSerializer, HanbokSerializer
-
-# from .permissons import IsOwnerOrReadOnly
+from .serializers import (
+    StoreListSerializer,
+    CreateStoreSerializer,
+    HanbokSerializer,
+    CreateHanbokSerializer,
+)
 
 
 # 한복집 리스트
 class StoreListView(APIView):
+    """
+    모든 한복집 리스트 -> 궁별 한복집 리스트로 변경할 예정
+    """
+
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request):
@@ -26,18 +33,22 @@ class StoreListView(APIView):
         )
 
     def post(self, request):
-        data = request.data
-        print(request.user)
-        serializer = CreateStoreSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save(owner_id=request.user)
-            return Response(
-                {"message": "한복집추가완료", "data": serializer.data},
-                status=status.HTTP_200_OK,
-            )
+        if request.user.is_staff == True:
+            serializer = CreateStoreSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(owner=request.user)
+                return Response(
+                    {"message": "한복집추가완료", "data": serializer.data},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"message": f"${serializer.errors}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
             return Response(
-                {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST
+                {"message": "권한이 없거나 잘못된 요청입니다."}, status=status.HTTP_403_FORBIDDEN
             )
 
 
@@ -47,11 +58,11 @@ class StoreDetailView(APIView):
     해당 한복집의 정보와 등록한 한복 상품 정보 노출
     """
 
-    # permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, store_id):
         store = get_object_or_404(Store, id=store_id)
-        hanboks = Hanbok.objects.filter(store_id=store_id)
+        hanboks = Hanbok.objects.filter(store=store_id)
         store_serializer = StoreListSerializer(store)
         hanbok_serializer = HanbokSerializer(hanboks, many=True)
 
@@ -64,15 +75,42 @@ class StoreDetailView(APIView):
         )
 
     def post(self, request, store_id):
-        data = request.data
-        serializer = HanbokSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save(owner_id=request.user)
-            return Response(
-                {"message": "한복 추가 완료", "data": serializer.data},
-                status=status.HTTP_200_OK,
-            )
+        """
+        staff인지 내가게인지 확인
+        """
+        my_store = list(Store.objects.filter(owner=request.user))
+        this_store = list(Store.objects.filter(id=store_id))
+
+        if (request.user.is_staff == True) and (
+            (this_store == my_store) or (this_store[0] in my_store)
+        ):
+            serializer = CreateHanbokSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(owner=request.user, store_id=store_id)
+                return Response(
+                    {"message": "한복 추가 완료", "data": serializer.data},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"message": f"${serializer.errors}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
             return Response(
-                {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST
+                {"message": "권한이 없거나 잘못된 요청입니다."}, status=status.HTTP_403_FORBIDDEN
             )
+
+    # # class StaffOnlyStoreView(APIView):
+    """
+        만약에 접속자의 스토어 중에 접속한 스토어 아이디가 없으면? - 거절
+        접속자 :  request.user
+        스토어 아이디 : store_id
+        접속자의 스토어 : stores = Store.object.filter(owner=request.user)
+        접속자의 스토어의 아이디?:
+    """
+
+
+#         hanboks = Hanbok.objects.filter(
+#             store=store_id
+#         )  # ____여기수정owner=request.user : 내가 추가한 상품만 노출됨
