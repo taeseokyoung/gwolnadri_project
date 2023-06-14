@@ -6,6 +6,11 @@ urlpatterns = [
     path("", views.StoreListView.as_view(), name="store_list"),
     path("<int:store_id>/", views.StoreDetailView.as_view(), name="store_detail_view"),
     path(
+        "hanbok/<int:hanbok_id>/",
+        views.HanbokDetailView.as_view(),
+        name="hanbok_detail",
+    ),
+    path(
         "payment/<int:user_id>/",
         views.PurchaseRecordView.as_view(),
         name="purchase_record",

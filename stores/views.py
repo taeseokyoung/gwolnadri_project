@@ -1,6 +1,5 @@
 from rest_framework import status
 from rest_framework import permissions
-
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -28,7 +27,7 @@ class StoreListView(APIView):
 
         return Response(
             {
-                "Store List": store_serializer.data,
+                "StoreList": store_serializer.data,
             },
             status=status.HTTP_200_OK,
         )
@@ -70,7 +69,7 @@ class StoreDetailView(APIView):
         return Response(
             {
                 "Store": store_serializer.data,
-                "Hanbok List": hanbok_serializer.data,
+                "HanbokList": hanbok_serializer.data,
             },
             status=status.HTTP_200_OK,
         )
@@ -103,9 +102,17 @@ class StoreDetailView(APIView):
             )
 
 
+# 한복 상세페이지
+class HanbokDetailView(APIView):
+    def get(self, request, hanbok_id):
+        hanbok = get_object_or_404(Hanbok, id=hanbok_id)
+        serializer = HanbokSerializer(hanbok)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 # 결제 승인요청
 class PurchaseRecordView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         pass
