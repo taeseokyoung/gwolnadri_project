@@ -149,6 +149,9 @@ class CommentDetailView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def put(self, request, store_id, comment_id):
+        """
+        한복점 리뷰 수정
+        """
         comment = get_object_or_404(HanbokComment, id=comment_id)
         if request.user == comment.user:
             serializer = CreateCommentSerializer(comment, data=request.data)
@@ -170,7 +173,21 @@ class CommentDetailView(APIView):
             )
 
     def delete(self, request, store_id, comment_id):
-        pass
+        """
+        한복점 리뷰 삭제
+        """
+        comment = get_object_or_404(HanbokComment, id=comment_id)
+        if request.user == comment.user:
+            comment.delete()
+            return Response(
+                {"message": "후기가 삭제되었습니다."},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        else:
+            return Response(
+                {"message": "권한이 없거나 잘못된 접근입니다."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
 
 # 결제 승인요청
