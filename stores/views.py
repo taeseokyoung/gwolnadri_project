@@ -66,13 +66,17 @@ class StoreDetailView(APIView):
     def get(self, request, store_id):
         store = get_object_or_404(Store, id=store_id)
         hanboks = Hanbok.objects.filter(store=store_id)
+        comments = HanbokComment.objects.filter(store=store_id)
+
         store_serializer = StoreListSerializer(store)
         hanbok_serializer = HanbokSerializer(hanboks, many=True)
+        comment_serializer = CommentSerializer(comments, many=True)
 
         return Response(
             {
                 "Store": store_serializer.data,
                 "HanbokList": hanbok_serializer.data,
+                "Comment": comment_serializer.data,
             },
             status=status.HTTP_200_OK,
         )

@@ -104,6 +104,7 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = HanbokComment
         fields = [
+            "id",
             "content",
             "review_image",
             "grade",
