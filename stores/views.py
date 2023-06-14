@@ -120,7 +120,7 @@ class StoreDetailView(APIView):
 
 # 결제 승인요청
 class PurchaseRecordView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         pass
