@@ -5,13 +5,13 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Store(models.Model):
     """
-    Hanbok Store 모델
+    Store 모델
     한복 상점 정보를 담습니다.
 
     Attributes:
-    user_id (Foreignkey): user_id(판매자)의 값을 가집니다
-    hanbok_store (varchar): 상점이름, 50자 제한
-    hanbok_address (varchar): 상점주소, 255자 제한
+    owner (Foreignkey): owner_id(판매자)의 값을 가집니다
+    store_name (varchar): 상점이름, 50자 제한
+    store_address (varchar): 상점주소, 255자 제한
     location_x (Float): 상점 x좌표
     location_y(Float): 상점 y좌표
     star (positiveInt): 별점 1~5 값                -----**평균별점값으로 변경필요!!----
@@ -45,7 +45,8 @@ class Hanbok(models.Model):
     한복 상품 정보를 담습니다.
 
     Attributes:
-    store_id (Foreignkey): store_id(한복가게 id)의 값을 가집니다
+    store (Foreignkey): store_id(한복가게 id)의 값을 가집니다
+    owner (Foreignkey): owner_id(판매자)의 값을 가집니다
     hanbok_name (varChar): 제품명, 255자 제한
     hanbok_description (varChar): 제품설명
     hanbok_price (positiveInt): 가격
@@ -70,28 +71,37 @@ class Hanbok(models.Model):
     def __str__(self):
         return self.hanbok_name
 
-# class HanbokStore(models.Model):
-#     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-#     hanbok_store = models.CharField(max_length=20)
 
-#     def __str__(self):
-#         return self.hanbok_store
+class HanbokComment(models.Model):
 
+    """
+    HanbokComment 모델
+    한복점 후기 정보를 담습니다.
 
-# class Hanbok(models.Model):
-#     store_name = models.ForeignKey(
-#         HanbokStore, on_delete=models.CASCADE, related_name="hanbok_list"
-#     )
-#     hanbok_owner = models.ForeignKey(User, on_delete=models.CASCADE)
-#     hanbok_name = models.CharField(
-#         max_length=20,
-#     )
-#     hanbok_description = models.CharField(max_length=100)
-#     hanbok_price = models.IntegerField()
-#     hanbok_image = models.ImageField(upload_to="media/stores/%m/")
+    Attributes:
+    store (Foreignkey): store_id(한복가게 id)의 값을 가집니다
+    user (Foreignkey): user_id(사용자)의 값을 가집니다
+    content (varChar): 후기내용, 100자 제한
+    review_image (Image) : 후기사진, 제품별 이미지 1장 (media/review 폴더에 월별로 저장)
+    created_at (datetime) : 생성일
+    updated_at (datetime) : 수정일
+    grade (positiveInt) : 평점, 1~5점을 부여합니다
+    """
 
-#     def __str__(self):
-#         return self.hanbok_name
+    store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name="comments")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.CharField("후기내용", max_length=100)
+    review_image = models.ImageField(
+        "후기사진", blank=True, null=True, upload_to="review/%Y/%M/"
+    )
+    created_at = models.DateTimeField("생성일", auto_now_add=True)
+    updated_at = models.DateTimeField("수정일", auto_now=True)
+    grade = models.PositiveIntegerField(
+        "평점", validators=[MaxValueValidator(5), MinValueValidator(1)]
+    )
+
+    def __str__(self):
+        return self.user
 
 
 class PurchaseRecord(models.Model):

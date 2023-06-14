@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Store, Hanbok, PurchaseRecord
+from .models import Store, Hanbok, HanbokComment, PurchaseRecord
 import requests, json
 import os
 import environ
@@ -98,7 +98,7 @@ class CreateHanbokSerializer(serializers.ModelSerializer):
         ]
 
 
-# 결제 정보 기록용 Serializer
+# ✅ 결제 정보 기록용 Serializer
 class PurchaseRecordCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseRecord
@@ -119,7 +119,7 @@ class PurchaseRecordCreateSerializer(serializers.ModelSerializer):
         ]
 
 
-# 결제 정보 조회용 Serializer
+# ✅ 결제 정보 조회용 Serializer
 class PurchaseRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseRecord
