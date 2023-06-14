@@ -56,7 +56,7 @@ class Hanbok(models.Model):
     store = models.ForeignKey(
         Store,
         on_delete=models.CASCADE,
-        related_name="products",
+        related_name="store",
         verbose_name="한복점",
     )
     owner = models.ForeignKey(

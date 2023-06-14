@@ -58,7 +58,7 @@ class StoreListView(APIView):
 # 한복집 상세 페이지
 class StoreDetailView(APIView):
     """
-    해당 한복집의 정보와 등록한 한복 상품 정보 노출
+    해당 한복집의 정보와 등록한 한복 상품 정보, 리뷰 노출
     """
 
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -112,9 +112,9 @@ class StoreDetailView(APIView):
 class CommentView(APIView):
     def get(self, request, store_id):
         """
-        한복점에 달린 모든 리뷰
+        한복점에 달린 모든 리뷰만 열람
         """
-        store = Store.objects.get(store_id=store_id)
+        store = Store.objects.get(id=store_id)
         comments = store.comments.all()
         comment_serializer = CommentSerializer(comments, many=True)
         return Response(
