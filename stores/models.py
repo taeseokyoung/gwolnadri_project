@@ -90,7 +90,7 @@ class HanbokComment(models.Model):
 
     store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    content = models.CharField("후기내용", max_length=100)
+    content = models.CharField("후기내용", max_length=50)
     review_image = models.ImageField(
         "후기사진", blank=True, null=True, upload_to="review/%Y/%M/"
     )
@@ -101,7 +101,7 @@ class HanbokComment(models.Model):
     )
 
     def __str__(self):
-        return self.user
+        return self.content
 
 
 class PurchaseRecord(models.Model):

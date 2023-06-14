@@ -11,6 +11,8 @@ from .serializers import (
     HanbokSerializer,
     CreateHanbokSerializer,
     PurchaseRecordCreateSerializer,
+    CommentSerializer,
+    CreateCommentSerializer,
 )
 
 
@@ -28,7 +30,7 @@ class StoreListView(APIView):
 
         return Response(
             {
-                "Store List": store_serializer.data,
+                "StoreList": store_serializer.data,
             },
             status=status.HTTP_200_OK,
         )
@@ -70,7 +72,7 @@ class StoreDetailView(APIView):
         return Response(
             {
                 "Store": store_serializer.data,
-                "Hanbok List": hanbok_serializer.data,
+                "HanbokList": hanbok_serializer.data,
             },
             status=status.HTTP_200_OK,
         )
@@ -101,6 +103,28 @@ class StoreDetailView(APIView):
             return Response(
                 {"message": "권한이 없거나 잘못된 요청입니다."}, status=status.HTTP_403_FORBIDDEN
             )
+
+
+class CommentView(APIView):
+    def get(self, request, store_id):
+        """
+        한복점에 달린 모든 리뷰
+        """
+        store = Store.objects.get(store_id=store_id)
+        comments = store.comments.all()
+        comment_serializer = CommentSerializer(comments, many=True)
+        return Response(
+            {
+                "Comment": comment_serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    def put(self, request, store_id):
+        pass
+
+    def delete(self, request, store_id):
+        pass
 
 
 # 결제 승인요청

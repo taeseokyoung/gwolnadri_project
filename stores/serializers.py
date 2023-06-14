@@ -77,6 +77,7 @@ class HanbokSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hanbok
         fields = (
+            "id",
             "store",
             "owner",
             "hanbok_name",
@@ -95,6 +96,30 @@ class CreateHanbokSerializer(serializers.ModelSerializer):
             "hanbok_description",
             "hanbok_price",
             "hanbok_image",
+        ]
+
+
+# ✅ 한복점 리뷰 열람 (후기내용, 후기사진, 평점, 생성일, 수정일)
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HanbokComment
+        fields = [
+            "content",
+            "review_image",
+            "grade",
+            "created_at",
+            "updated_at",
+        ]
+
+
+# ✅ 한복점 리뷰 등록 (후기내용, 후기사진, 평점, 생성일, 수정일)
+class CreateCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HanbokComment
+        fields = [
+            "content",
+            "review_image",
+            "grade",
         ]
 
 
