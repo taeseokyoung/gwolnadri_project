@@ -28,7 +28,7 @@ class StoreListView(APIView):
 
         return Response(
             {
-                "Store List": store_serializer.data,
+                "StoreList": store_serializer.data,
             },
             status=status.HTTP_200_OK,
         )
@@ -70,7 +70,7 @@ class StoreDetailView(APIView):
         return Response(
             {
                 "Store": store_serializer.data,
-                "Hanbok List": hanbok_serializer.data,
+                "HanbokList": hanbok_serializer.data,
             },
             status=status.HTTP_200_OK,
         )
@@ -101,6 +101,14 @@ class StoreDetailView(APIView):
             return Response(
                 {"message": "권한이 없거나 잘못된 요청입니다."}, status=status.HTTP_403_FORBIDDEN
             )
+
+
+# 한복 상세페이지
+class HanbokDetailView(APIView):
+    def get(self, request, hanbok_id):
+        hanbok = get_object_or_404(Hanbok, id=hanbok_id)
+        serializer = HanbokSerializer(hanbok)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 # 결제 승인요청
