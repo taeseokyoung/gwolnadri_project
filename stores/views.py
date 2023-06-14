@@ -112,7 +112,7 @@ class HanbokDetailView(APIView):
 
 # 결제 승인요청
 class PurchaseRecordView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         pass
