@@ -5,13 +5,13 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
-    path("signup/", views.SignUpView.as_view(), name="signup"),
+    path("signup/", views.SignupView.as_view(), name="signup"),
     path("token/", views.LoginView.as_view(), name="login"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 
-    # path("me/", views.UserDetailView.as_view(), name="user_detail_view"),
-    # path("me/modify/", views.UserDetailView.as_view(), name="user_detail_modify"),
-    # path("me/delete/", views.UserDetailView.as_view(), name="user_detail_delete"),
+    path("me/", views.Me.as_view(), name="profile_view"),
+    path("me/modify/", views.UserView.as_view(), name="profile_modify"),
+    path("me/delete/", views.UserView.as_view(), name="uprofile_delete"),
 
     path('google/login/', views.google_login, name='google_login'),
     path('google/login/callback/', views.google_callback, name='google_callback'),

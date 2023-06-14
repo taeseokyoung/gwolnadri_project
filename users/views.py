@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.http import JsonResponse
 from json.decoder import JSONDecodeError
 from dj_rest_auth.registration.views import SocialLoginView
@@ -15,11 +15,11 @@ from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.naver import views as naver_view
 from allauth.socialaccount.models import SocialAccount
 from .models import User
-from .serializers import UserTokenObtainPairSerializer, UserSerializer
+from .serializers import UserTokenObtainPairSerializer, UserSerializer, UserUpdateSerializer
 
 
-# 회원가입
-class SignUpView(APIView):
+# 회원가입, 수정, 회원탈퇴
+class SignupView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -27,8 +27,33 @@ class SignUpView(APIView):
             return Response({"message": "가입완료!"}, status=status.HTTP_201_CREATED)
         else:
             return Response(
-                {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST
-            )
+                {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserView(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        if request.user == user:
+            serializer = UserUpdateSerializer(user, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response({"message": "회원 탈퇴 완료"}, status=status.HTTP_204_NO_CONTENT)
 
 
 # 로그인
@@ -49,36 +74,17 @@ def generate_jwt_token(user):
     return {'refresh': str(refresh), 'access': str(refresh.access_token)}
 
 
-# # 마이페이지 보기
-# class UserDetailView(APIView):
-#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-#
-#     def get(self, request, user_id):
-#         user = get_object_or_404(User, id=user_id)
-#         serializer = UserSerializer(user)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-#
-#     # 회원정보 수정
-#     def put(self, request, user_id):
-#         user = get_object_or_404(User, id=user_id)
-#         if request.user == user:
-#             serializer = UserSerializer(user, data=request.data)
-#             if serializer.is_valid():
-#                 serializer.save()
-#                 return Response(serializer.data, status=status.HTTP_200_OK)
-#             else:
-#                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#         else:
-#             return Response(status=status.HTTP_403_FORBIDDEN)
-#
-#     # 회원탈퇴
-#     def delete(self, request, user_id):
-#         user = get_object_or_404(User, id=user_id)
-#         if request.user == user:
-#             user.delete()
-#             return Response("회원탈퇴 되었습니다!", status=status.HTTP_204_OK)
-#         else:
-#             return Response("권한이 없습니다.", status=status.HTTP_403_FORBIDDEN)
+# 마이페이지 보기
+class Me(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user:
+            serializer = UserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -137,8 +143,6 @@ def google_callback(request):
     # 에러 아니면, get email
     email_req_json = email_req.json()
     email = email_req_json.get("email")
-
-    print(email_req_json)
 
     ## 회원가입/ 로그인
     try:
@@ -276,6 +280,7 @@ def kakao_callback(request):
         accept_json.pop('user', None)
         return JsonResponse(accept_json)
 
+
 class KakaoLogin(SocialLoginView):
     adapter_class = kakao_view.KakaoOAuth2Adapter
     client_class = OAuth2Client
@@ -367,4 +372,3 @@ class NaverLogin(SocialLoginView):
     adapter_class = naver_view.NaverOAuth2Adapter
     callback_url = NAVER_CALLBACK_URI
     client_class = OAuth2Client
-
