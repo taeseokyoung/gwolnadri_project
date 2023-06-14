@@ -92,7 +92,7 @@ class HanbokComment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.CharField("후기내용", max_length=50)
     review_image = models.ImageField(
-        "후기사진", blank=True, null=True, upload_to="review/%Y/%M/"
+        "후기사진", blank=True, null=True, upload_to="review/%Y/%m/"
     )
     created_at = models.DateTimeField("생성일", auto_now_add=True)
     updated_at = models.DateTimeField("수정일", auto_now=True)

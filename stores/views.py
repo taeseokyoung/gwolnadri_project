@@ -110,6 +110,8 @@ class StoreDetailView(APIView):
 
 
 class CommentView(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def get(self, request, store_id):
         """
         한복점에 달린 모든 리뷰만 열람
@@ -123,6 +125,23 @@ class CommentView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+    def post(self, request, store_id):
+        """
+        한복점 리뷰 작성 로그인한 사람이면 모두 가능
+        """
+        serializer = CreateCommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(store_id=store_id, user=request.user)
+            return Response(
+                {"message": "한복 추가 완료", "data": serializer.data},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {"message": f"${serializer.errors}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     def put(self, request, store_id):
         pass
