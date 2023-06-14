@@ -44,6 +44,11 @@ class EventSerializer(serializers.ModelSerializer):
     event_start_date = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
     event_end_date = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
     review_count = serializers.SerializerMethodField()
+    author = serializers.SerializerMethodField()
+
+    def get_author(self, obj):
+        author = obj.author.email.split("@")[0]
+        return author
 
     def get_review_count(self, obj):
         return obj.review_set.count()
@@ -127,6 +132,7 @@ class EventReviewCreateSerializer(serializers.ModelSerializer):
             "grade",
         )
 
+
 class TicketCreateSerializer(serializers.ModelSerializer):
     event_date = serializers.DateField()
     event_time = serializers.CharField(max_length=11)
@@ -138,15 +144,16 @@ class TicketCreateSerializer(serializers.ModelSerializer):
         event_date = attrs.get("event_date")
         event_time = attrs.get("event_time")
 
-        
         try:
             event = Event.objects.get(id=event_id)
         except Event.DoesNotExist:
             raise serializers.ValidationError("유효한 이벤트를 선택해 주세요")
 
-        if event.event_start_date.date() > event_date and event_date< event.event_end_date.date():
+        if (
+            event.event_start_date.date() > event_date
+            and event_date < event.event_end_date.date()
+        ):
             raise serializers.ValidationError("공연 기간을 확인해 주세요")
-        
 
         time_slots = event.time_slots
 
@@ -161,16 +168,18 @@ class TicketCreateSerializer(serializers.ModelSerializer):
 
         attrs["event"] = event
         return attrs
-    
+
     class Meta:
         model = Ticket
         fields = "__all__"
-        read_only_fields = ('author','event')
-        
+        read_only_fields = ("author", "event")
+
+
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = "__all__"
+
 
 class BookedTicketSerializer(serializers.ModelSerializer):
     event = serializers.SerializerMethodField()
@@ -178,9 +187,12 @@ class BookedTicketSerializer(serializers.ModelSerializer):
     event_time = serializers.CharField()
 
     def get_event(self, ticket):
-        return ticket.event.title 
-    
+        return ticket.event.title
+
     class Meta:
         model = Ticket
-        fields = ("event","event_date","event_time",)
-
+        fields = (
+            "event",
+            "event_date",
+            "event_time",
+        )
