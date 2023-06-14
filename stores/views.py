@@ -83,7 +83,7 @@ class StoreDetailView(APIView):
 
     def post(self, request, store_id):
         """
-        staff인지 내가게인지 확인
+        staff인지 && 내가게인지 확인
         """
         my_store = list(Store.objects.filter(owner=request.user))
         this_store = list(Store.objects.filter(id=store_id))
@@ -116,7 +116,7 @@ class CommentView(APIView):
         """
         한복점에 달린 모든 리뷰만 열람
         """
-        store = Store.objects.get(id=store_id)
+        store = get_object_or_404(Store, id=store_id)
         comments = store.comments.all()
         comment_serializer = CommentSerializer(comments, many=True)
         return Response(
@@ -128,25 +128,48 @@ class CommentView(APIView):
 
     def post(self, request, store_id):
         """
-        한복점 리뷰 작성 로그인한 사람이면 모두 가능
+        한복점 리뷰 작성 로그인한 사람이면 모두 가능  -- post할때마다 평균별점에 반영**
         """
-        serializer = CreateCommentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(store_id=store_id, user=request.user)
+        comment_serializer = CreateCommentSerializer(data=request.data)
+        # store_serializer = #star 필드 일부 수정해야하는ㄷ데....
+        if comment_serializer.is_valid():
+            comment_serializer.save(store_id=store_id, user=request.user)
             return Response(
-                {"message": "한복 추가 완료", "data": serializer.data},
+                {"message": "한복 추가 완료", "data": comment_serializer.data},
                 status=status.HTTP_200_OK,
             )
         else:
             return Response(
-                {"message": f"${serializer.errors}"},
+                {"message": f"${comment_serializer.errors}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    def put(self, request, store_id):
-        pass
 
-    def delete(self, request, store_id):
+class CommentDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def put(self, request, store_id, comment_id):
+        comment = get_object_or_404(HanbokComment, id=comment_id)
+        if request.user == comment.user:
+            serializer = CreateCommentSerializer(comment, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    {"message": "리뷰 수정 완료", "data": serializer.data},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"message": f"${serializer.errors}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            return Response(
+                {"message": "권한이 없거나 잘못된 접근입니다."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+    def delete(self, request, store_id, comment_id):
         pass
 
 
