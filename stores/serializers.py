@@ -69,7 +69,6 @@ class CreateStoreSerializer(serializers.ModelSerializer):
             store_address=validated_data["store_address"],
             location_x=location_result[0],
             location_y=location_result[1],
-            star=0,
         )
         store.save()
         return store

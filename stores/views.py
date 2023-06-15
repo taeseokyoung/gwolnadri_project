@@ -128,14 +128,13 @@ class CommentView(APIView):
 
     def post(self, request, store_id):
         """
-        한복점 리뷰 작성 로그인한 사람이면 모두 가능  -- post할때마다 평균별점에 반영**
+        한복점 리뷰 작성 로그인한 사람이면 모두 가능
         """
         comment_serializer = CreateCommentSerializer(data=request.data)
-        # store_star = 현재 스타 필드 값을 가져오기
         if comment_serializer.is_valid():
             comment_serializer.save(store_id=store_id, user=request.user)
             return Response(
-                {"message": "한복 추가 완료", "data": comment_serializer.data},
+                {"message": "후기 추가 완료", "data": comment_serializer.data},
                 status=status.HTTP_200_OK,
             )
         else:
@@ -152,13 +151,14 @@ class CommentDetailView(APIView):
         """
         한복점 리뷰 수정
         """
-        comment = get_object_or_404(HanbokComment, id=comment_id)
+        comment = get_object_or_404(HanbokComment, id=comment_id, store_id=store_id)
+        print("여기여기여기 : ", comment)
         if request.user == comment.user:
             serializer = CreateCommentSerializer(comment, data=request.data)
             if serializer.is_valid():
-                serializer.save(store=store_id)
+                serializer.save(store_id=store_id, id=comment_id)
                 return Response(
-                    {"message": "리뷰 수정 완료", "data": serializer.data},
+                    {"message": "후기 수정 완료", "data": serializer.data},
                     status=status.HTTP_200_OK,
                 )
             else:
@@ -176,7 +176,7 @@ class CommentDetailView(APIView):
         """
         한복점 리뷰 삭제
         """
-        comment = get_object_or_404(HanbokComment, id=comment_id)
+        comment = get_object_or_404(HanbokComment, id=comment_id, store_id=store_id)
         if request.user == comment.user:
             comment.delete()
             return Response(

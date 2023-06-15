@@ -20,7 +20,7 @@ class Store(models.Model):
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="stores",
+        # related_name="stores",
         verbose_name="판매자",
     )
     store_name = models.CharField("상점이름", max_length=50)
@@ -51,7 +51,7 @@ class Hanbok(models.Model):
     store = models.ForeignKey(
         Store,
         on_delete=models.CASCADE,
-        related_name="store",
+        # related_name="store",
         verbose_name="한복점",
     )
     owner = models.ForeignKey(
