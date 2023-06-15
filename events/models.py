@@ -35,8 +35,10 @@ class Event(models.Model):
     time_slots = models.JSONField()
     max_booking = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     money = models.IntegerField()
-    likes = models.ManyToManyField(User, related_name="like_event")
-    event_bookmarks = models.ManyToManyField(User, related_name="bookmark_events")
+    likes = models.ManyToManyField(User, related_name="like_event", blank=True)
+    event_bookmarks = models.ManyToManyField(
+        User, related_name="bookmark_events", blank=True
+    )
 
 
 class Ticket(models.Model):
