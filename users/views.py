@@ -15,7 +15,13 @@ from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.naver import views as naver_view
 from allauth.socialaccount.models import SocialAccount
 from .models import User
-from .serializers import UserTokenObtainPairSerializer, UserSerializer
+from .serializers import (
+    UserTokenObtainPairSerializer,
+    UserSerializer,
+    UserProfileSerializer,
+)
+
+from rest_framework.generics import get_object_or_404
 
 
 # 회원가입
@@ -40,50 +46,29 @@ class CustomRefreshToken(RefreshToken):
     @classmethod
     def for_user(cls, user):
         token = super().for_user(user)
-        token['email'] = user.email
+        token["email"] = user.email
         return token
 
 
 def generate_jwt_token(user):
     refresh = CustomRefreshToken.for_user(user)
-    return {'refresh': str(refresh), 'access': str(refresh.access_token)}
+    return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
 
-# # 마이페이지 보기
-# class UserDetailView(APIView):
-#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-#
-#     def get(self, request, user_id):
-#         user = get_object_or_404(User, id=user_id)
-#         serializer = UserSerializer(user)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-#
-#     # 회원정보 수정
-#     def put(self, request, user_id):
-#         user = get_object_or_404(User, id=user_id)
-#         if request.user == user:
-#             serializer = UserSerializer(user, data=request.data)
-#             if serializer.is_valid():
-#                 serializer.save()
-#                 return Response(serializer.data, status=status.HTTP_200_OK)
-#             else:
-#                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#         else:
-#             return Response(status=status.HTTP_403_FORBIDDEN)
-#
-#     # 회원탈퇴
-#     def delete(self, request, user_id):
-#         user = get_object_or_404(User, id=user_id)
-#         if request.user == user:
-#             user.delete()
-#             return Response("회원탈퇴 되었습니다!", status=status.HTTP_204_OK)
-#         else:
-#             return Response("권한이 없습니다.", status=status.HTTP_403_FORBIDDEN)
+# 마이페이지 보기
+class Me(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user:
+            serializer = UserProfileSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
-# 소 셜 로 그 인
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
+# 소셜로그인
 
 BASE_URL = "http://127.0.0.1:8000/"
 GOOGLE_CALLBACK_URI = BASE_URL + "users/google/login/callback/"
@@ -132,7 +117,9 @@ def google_callback(request):
 
     # 에러
     if email_req_status != 200:
-        return JsonResponse({'err_msg': 'FAILED TO GET EMAIL'}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(
+            {"err_msg": "FAILED TO GET EMAIL"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
     # 에러 아니면, get email
     email_req_json = email_req.json()
@@ -147,11 +134,17 @@ def google_callback(request):
 
         # 소셜 유저 아닐 경우
         if social_user is None:
-            return JsonResponse({'err_msg': 'EMAIL EXISTS BUT NOT SOCIAL USER'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(
+                {"err_msg": "EMAIL EXISTS BUT NOT SOCIAL USER"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # 소셜 유저지만 Google이 아닐 경우
         if social_user.provider != "google":
-            return JsonResponse({'err_msg': 'NO MATCHING SOCIAL TYPE'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(
+                {"err_msg": "NO MATCHING SOCIAL TYPE"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # 기존에 Google로 가입된 유저 - 로그인, jwt 발급
         data = {"access_token": access_token, "code": code}
@@ -160,10 +153,10 @@ def google_callback(request):
 
         # 에러 - 로그인 실패
         if accept_status != 200:
-            return JsonResponse({'err_msg': 'FAILED TO SIGN IN'}, status=accept_status)
+            return JsonResponse({"err_msg": "FAILED TO SIGN IN"}, status=accept_status)
 
         accept_json = accept.json()
-        accept_json.pop('user', None)
+        accept_json.pop("user", None)
         return JsonResponse(accept_json)
 
     # 기존 가입된 유저가 없으면, 새로 회원가입
@@ -174,10 +167,10 @@ def google_callback(request):
 
         # 에러 - 회원가입 실패
         if accept_status != 200:
-            return JsonResponse({'err_msg': 'FAILED TO SIGNUP'}, status=accept_status)
+            return JsonResponse({"err_msg": "FAILED TO SIGNUP"}, status=accept_status)
 
         accept_json = accept.json()
-        accept_json.pop('user', None)
+        accept_json.pop("user", None)
         return JsonResponse(accept_json)
 
 
@@ -228,7 +221,7 @@ def kakao_callback(request):
         raise JSONDecodeError(error)
 
     kakao_account = profile_json.get("kakao_account")
-    email = kakao_account.get('email')
+    email = kakao_account.get("email")
 
     ## 회원가입/ 로그인
     try:
@@ -237,11 +230,17 @@ def kakao_callback(request):
 
         # 소셜 유저가 아닐 경우
         if social_user is None:
-            return JsonResponse({'err_msg': 'EMAIL EXISTS BUT NOT SOCIAL USER'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(
+                {"err_msg": "EMAIL EXISTS BUT NOT SOCIAL USER"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # 소셜 유저지만 Kakao가 아닐 경우
         if social_user.provider != "kakao":
-            return JsonResponse({'err_msg': 'NO MATCHING SOCIAL TYPE'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(
+                {"err_msg": "NO MATCHING SOCIAL TYPE"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # 기존에 Kakao로 가입된 유저 - 로그인
         data = {"access_token": access_token, "code": code}
@@ -250,10 +249,10 @@ def kakao_callback(request):
 
         # 에러 - 로그인 실패
         if accept_status != 200:
-            return JsonResponse({'err_msg': 'FAILED TO SIGN IN'}, status=accept_status)
+            return JsonResponse({"err_msg": "FAILED TO SIGN IN"}, status=accept_status)
 
         accept_json = accept.json()
-        accept_json.pop('user', None)
+        accept_json.pop("user", None)
         return JsonResponse(accept_json)
 
         # JWT 토큰 발급 후 redirect
@@ -270,11 +269,12 @@ def kakao_callback(request):
 
         # 에러 - 회원가입 실패
         if accept_status != 200:
-            return JsonResponse({'err_msg': 'FAILED TO SIGN UP'}, status=accept_status)
+            return JsonResponse({"err_msg": "FAILED TO SIGN UP"}, status=accept_status)
 
         accept_json = accept.json()
-        accept_json.pop('user', None)
+        accept_json.pop("user", None)
         return JsonResponse(accept_json)
+
 
 class KakaoLogin(SocialLoginView):
     adapter_class = kakao_view.KakaoOAuth2Adapter
@@ -299,7 +299,8 @@ def naver_callback(request):
 
     ## 받은 코드로 Access Token Request
     token_request = requests.get(
-        f"https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id={client_id}&client_secret={client_secret}&code={code}&state={state_string}")
+        f"https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id={client_id}&client_secret={client_secret}&code={code}&state={state_string}"
+    )
 
     # json으로 변환
     token_response_json = token_request.json()
@@ -331,11 +332,17 @@ def naver_callback(request):
 
         # 소셜 유저 아닐 경우
         if social_user is None:
-            return JsonResponse({'err_msg': 'EMAIL EXISTS BUT NOT SOCIAL USER'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(
+                {"err_msg": "EMAIL EXISTS BUT NOT SOCIAL USER"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # 소셜 유저지만 Naver이 아닐 경우
         if social_user.provider != "naver":
-            return JsonResponse({'err_msg': 'NO MATCHING SOCIAL TYPE'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(
+                {"err_msg": "NO MATCHING SOCIAL TYPE"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # 기존에 Naver로 가입된 유저 - 로그인
         data = {"access_token": access_token, "code": code}
@@ -343,10 +350,10 @@ def naver_callback(request):
         accept_status = accept.status_code
 
         if accept_status != 200:
-            return JsonResponse({'err_msg': 'FAILED TO SIGN IN'}, status=accept_status)
+            return JsonResponse({"err_msg": "FAILED TO SIGN IN"}, status=accept_status)
 
         accept_json = accept.json()
-        accept_json.pop('user', None)
+        accept_json.pop("user", None)
         return JsonResponse(accept_json)
 
     # 기존 가입된 유저가 없으면, 새로 회원가입
@@ -356,10 +363,10 @@ def naver_callback(request):
         accept_status = accept.status_code
 
         if accept_status != 200:
-            return JsonResponse({'err_msg': 'FAILED TO SIGN UP'}, status=accept_status)
+            return JsonResponse({"err_msg": "FAILED TO SIGN UP"}, status=accept_status)
 
         accept_json = accept.json()
-        accept_json.pop('user', None)
+        accept_json.pop("user", None)
         return JsonResponse(accept_json)
 
 
@@ -367,4 +374,3 @@ class NaverLogin(SocialLoginView):
     adapter_class = naver_view.NaverOAuth2Adapter
     callback_url = NAVER_CALLBACK_URI
     client_class = OAuth2Client
-
