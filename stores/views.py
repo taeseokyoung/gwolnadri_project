@@ -131,7 +131,7 @@ class CommentView(APIView):
         한복점 리뷰 작성 로그인한 사람이면 모두 가능  -- post할때마다 평균별점에 반영**
         """
         comment_serializer = CreateCommentSerializer(data=request.data)
-        # store_serializer = #star 필드 일부 수정해야하는ㄷ데....
+        # store_star = 현재 스타 필드 값을 가져오기
         if comment_serializer.is_valid():
             comment_serializer.save(store_id=store_id, user=request.user)
             return Response(
@@ -156,7 +156,7 @@ class CommentDetailView(APIView):
         if request.user == comment.user:
             serializer = CreateCommentSerializer(comment, data=request.data)
             if serializer.is_valid():
-                serializer.save()
+                serializer.save(store=store_id)
                 return Response(
                     {"message": "리뷰 수정 완료", "data": serializer.data},
                     status=status.HTTP_200_OK,
@@ -187,6 +187,23 @@ class CommentDetailView(APIView):
             return Response(
                 {"message": "권한이 없거나 잘못된 접근입니다."},
                 status=status.HTTP_403_FORBIDDEN,
+            )
+
+
+class LikeView(APIView):
+    def post(self, request, store_id):
+        store = get_object_or_404(Store, id=store_id)
+        if request.user in store.likes.all():
+            store.likes.remove(request.user)
+            return Response(
+                {"message": "좋아요가 취소되었습니다"},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            store.likes.add(request.user)
+            return Response(
+                {"message": "좋아요 눌렀습니다"},
+                status=status.HTTP_200_OK,
             )
 
 

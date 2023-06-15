@@ -33,6 +33,7 @@ class Store(models.Model):
         blank=True,
         null=True,
     )
+    likes = models.ManyToManyField(User, related_name="like_stores")
 
     def __str__(self):
         return self.store_name

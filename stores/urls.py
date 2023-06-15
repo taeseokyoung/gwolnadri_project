@@ -11,6 +11,7 @@ urlpatterns = [
         views.CommentDetailView.as_view(),
         name="comment_detail_view",
     ),
+    path("<int:store_id>/like/", views.LikeView.as_view(), name="like_view"),
     path(
         "payment/<int:user_id>/",
         views.PurchaseRecordView.as_view(),
