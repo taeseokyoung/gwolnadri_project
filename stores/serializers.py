@@ -1,8 +1,9 @@
 from rest_framework import serializers
-from .models import Store, Hanbok, PurchaseRecord
+from .models import Store, Hanbok, HanbokComment, PurchaseRecord
 import requests, json
 import os
 import environ
+from django.db.models import Avg
 
 
 # ✅ 위치정보 api
@@ -17,12 +18,22 @@ def get_location(address):
     return result
 
 
-# ✅ 한복집 리스트 (id, 판매자, 가게이름, 가게주소, x좌표, y좌표, 별점)
+# ✅ 한복집 리스트 (id, 판매자, 가게이름, 가게주소, x좌표, y좌표, 전체 좋아요 수, 평균 별점)
 class StoreListSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
+    total_likes = serializers.SerializerMethodField()
+    avg_stars = serializers.SerializerMethodField()
 
     def get_owner(self, obj):
         return obj.owner.id
+
+    def get_total_likes(self, obj):
+        return obj.likes.count()
+
+    def get_avg_stars(self, obj):
+        return HanbokComment.objects.filter(store=obj.id).aggregate(
+            avg_stars=Avg("grade")
+        )
 
     class Meta:
         model = Store
@@ -33,7 +44,9 @@ class StoreListSerializer(serializers.ModelSerializer):
             "store_address",
             "location_x",
             "location_y",
-            "star",
+            "likes",
+            "total_likes",
+            "avg_stars",
         )
 
 
@@ -56,7 +69,6 @@ class CreateStoreSerializer(serializers.ModelSerializer):
             store_address=validated_data["store_address"],
             location_x=location_result[0],
             location_y=location_result[1],
-            star=0,
         )
         store.save()
         return store
@@ -77,6 +89,7 @@ class HanbokSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hanbok
         fields = (
+            "id",
             "store",
             "owner",
             "hanbok_name",
@@ -98,7 +111,34 @@ class CreateHanbokSerializer(serializers.ModelSerializer):
         ]
 
 
-# 결제 정보 기록용 Serializer
+# ✅ 한복점 리뷰 열람 (후기내용, 후기사진, 평점, 생성일, 수정일)
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HanbokComment
+        fields = [
+            "id",
+            "store",
+            "user",
+            "content",
+            "review_image",
+            "grade",
+            "created_at",
+            "updated_at",
+        ]
+
+
+# ✅ 한복점 리뷰 등록 (후기내용, 후기사진, 평점, 생성일, 수정일)
+class CreateCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HanbokComment
+        fields = [
+            "content",
+            "review_image",
+            "grade",
+        ]
+
+
+# ✅ 결제 정보 기록용 Serializer
 class PurchaseRecordCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseRecord
@@ -119,7 +159,7 @@ class PurchaseRecordCreateSerializer(serializers.ModelSerializer):
         ]
 
 
-# 결제 정보 조회용 Serializer
+# ✅ 결제 정보 조회용 Serializer
 class PurchaseRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseRecord
