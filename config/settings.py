@@ -14,9 +14,11 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # env 설정 : SECRET_KEY
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
+
+# DEBUG = False 는 소셜로그인
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -27,6 +29,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "rest_framework.authtoken",
+    "rest_framework_simplejwt.token_blacklist",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.kakao",
+    "allauth.socialaccount.providers.naver",
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
@@ -88,6 +101,15 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
 ]
 
 
@@ -121,12 +143,13 @@ AUTH_USER_MODEL = "users.User"
 # rest_framework and simple jwt
 from datetime import timedelta
 
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     )
 }
+
+REST_USE_JWT = True
 
 
 SIMPLE_JWT = {
@@ -169,3 +192,11 @@ SIMPLE_JWT = {
 
 # cors
 CORS_ALLOW_ALL_ORIGINS = True
+
+SITE_ID = 1
+
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USERNAME_REQUIRED = False

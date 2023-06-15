@@ -13,6 +13,11 @@ urlpatterns = [
     ),
     path("<int:store_id>/like/", views.LikeView.as_view(), name="like_view"),
     path(
+        "hanbok/<int:hanbok_id>/",
+        views.HanbokDetailView.as_view(),
+        name="hanbok_detail",
+    ),
+    path(
         "payment/<int:user_id>/",
         views.PurchaseRecordView.as_view(),
         name="purchase_record",
@@ -21,5 +26,10 @@ urlpatterns = [
         "payment/<tid>/",
         views.PutPurchaseRecordView.as_view(),
         name="put_purchase_record",
+    ),
+    path(
+        "<int:store_id>/bookmark/",
+        views.StoreBookmarkView.as_view(),
+        name="bookmark_store_view",
     ),
 ]

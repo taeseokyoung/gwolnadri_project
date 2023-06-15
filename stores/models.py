@@ -28,6 +28,10 @@ class Store(models.Model):
     location_x = models.FloatField("x좌표", blank=True, null=True)
     location_y = models.FloatField("y좌표", blank=True, null=True)
     likes = models.ManyToManyField(User, related_name="like_stores")
+    store_bookmarks = models.ManyToManyField(
+        User, related_name="bookmark_stores", blank=True
+    )
+
 
     def __str__(self):
         return self.store_name
@@ -66,7 +70,7 @@ class Hanbok(models.Model):
     def __str__(self):
         return self.hanbok_name
 
-
+      
 class HanbokComment(models.Model):
 
     """
@@ -97,7 +101,6 @@ class HanbokComment(models.Model):
 
     def __str__(self):
         return self.content
-
 
 class PurchaseRecord(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
