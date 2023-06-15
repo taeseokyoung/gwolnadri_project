@@ -27,12 +27,6 @@ class Store(models.Model):
     store_address = models.CharField("상점주소", max_length=255, unique=True)
     location_x = models.FloatField("x좌표", blank=True, null=True)
     location_y = models.FloatField("y좌표", blank=True, null=True)
-    star = models.PositiveIntegerField(
-        "별점",
-        validators=[MaxValueValidator(5), MinValueValidator(1)],
-        blank=True,
-        null=True,
-    )
     likes = models.ManyToManyField(User, related_name="like_stores")
 
     def __str__(self):

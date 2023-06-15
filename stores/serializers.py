@@ -3,6 +3,7 @@ from .models import Store, Hanbok, HanbokComment, PurchaseRecord
 import requests, json
 import os
 import environ
+from django.db.models import Avg
 
 
 # ✅ 위치정보 api
@@ -17,16 +18,22 @@ def get_location(address):
     return result
 
 
-# ✅ 한복집 리스트 (id, 판매자, 가게이름, 가게주소, x좌표, y좌표, 별점, 전체 좋아요 수)
+# ✅ 한복집 리스트 (id, 판매자, 가게이름, 가게주소, x좌표, y좌표, 전체 좋아요 수, 평균 별점)
 class StoreListSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     total_likes = serializers.SerializerMethodField()
+    avg_stars = serializers.SerializerMethodField()
 
     def get_owner(self, obj):
         return obj.owner.id
 
     def get_total_likes(self, obj):
         return obj.likes.count()
+
+    def get_avg_stars(self, obj):
+        return HanbokComment.objects.filter(store=obj.id).aggregate(
+            avg_stars=Avg("grade")
+        )
 
     class Meta:
         model = Store
@@ -37,9 +44,9 @@ class StoreListSerializer(serializers.ModelSerializer):
             "store_address",
             "location_x",
             "location_y",
-            "star",
             "likes",
             "total_likes",
+            "avg_stars",
         )
 
 
@@ -123,27 +130,13 @@ class CommentSerializer(serializers.ModelSerializer):
 
 # ✅ 한복점 리뷰 등록 (후기내용, 후기사진, 평점, 생성일, 수정일)
 class CreateCommentSerializer(serializers.ModelSerializer):
-    # store = serializers.SerializerMethodField()
-
-    # def get_store(self, obj):
-    #     return obj.owner.id
-
     class Meta:
         model = HanbokComment
         fields = [
-            # "store",
             "content",
             "review_image",
             "grade",
         ]
-
-    # def save(self, *args, **kwargs):
-    #     my_star = self.validated_data["grade"]
-    #     # 다른 모델 테이블의 필드 일부 값을 변경가능한지
-    #     # store_id = self.validated_data["store"]
-    #     # total_star =
-    #     # print(store_id)
-    #     super().save(*args, **kwargs)
 
 
 # ✅ 결제 정보 기록용 Serializer
