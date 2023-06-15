@@ -1,5 +1,3 @@
-
-
 from pathlib import Path
 import os
 import environ
@@ -16,7 +14,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # env 설정 : SECRET_KEY
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-# DEBUG = False
+
+# DEBUG = False 는 소셜로그인
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
@@ -31,20 +30,16 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
-
     "rest_framework.authtoken",
     "rest_framework_simplejwt.token_blacklist",
-
     "dj_rest_auth",
     "dj_rest_auth.registration",
-
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "allauth.socialaccount.providers.kakao",
     "allauth.socialaccount.providers.naver",
-
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
@@ -105,19 +100,15 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-
     },
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-
     },
 ]
 
@@ -153,8 +144,8 @@ AUTH_USER_MODEL = "users.User"
 from datetime import timedelta
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     )
 }
 
@@ -169,7 +160,6 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
-
     "UPDATE_LAST_LOGIN": False,
     "ALGORITHM": "HS256",
     "SIGNING_KEY": os.environ.get("SECRET_KEY"),
@@ -179,7 +169,6 @@ SIMPLE_JWT = {
     "JSON_ENCODER": None,
     "JWK_URL": None,
     "LEEWAY": 0,
-
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     "USER_ID_FIELD": "id",
@@ -206,9 +195,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 SITE_ID = 1
 
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
-

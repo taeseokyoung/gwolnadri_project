@@ -1,4 +1,3 @@
-
 from rest_framework.exceptions import NotFound
 from rest_framework import status, permissions, generics
 from rest_framework.decorators import APIView
@@ -17,7 +16,7 @@ from events.serializers import (
     TicketCreateSerializer,
     TicketSerializer,
     BookedTicketSerializer,
-    BookedTicketCountSerializer
+    BookedTicketCountSerializer,
 )
 
 
@@ -171,6 +170,7 @@ class EventReviewDetailView(APIView):
         review.delete()
         return Response({"message": "삭제완료"}, status=status.HTTP_204_NO_CONTENT)
 
+
 class TicketView(generics.ListCreateAPIView):
     """
     [권한]
@@ -183,35 +183,42 @@ class TicketView(generics.ListCreateAPIView):
     queryset을 사용하여 어떻게 가져올지 결정합니다.
     Ticket모델의 모든 오브젝트를 가져와 get요청 시 보여줍니다.
     """
+
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, CustomPermission]
     serializer_class = TicketCreateSerializer
     queryset = Ticket.objects.all()
 
-    #이벤트_id를 가져와 시리얼라이저에 넣어줘 권한을 확인하기위해 get_serializer_context를 오버라이딩하여 사용했습니다.
-    def get_serializer_context(self): 
-        context = super(TicketView, self).get_serializer_context() 
-        context.update({"event": self.kwargs["event_id"]}) 
+    # 이벤트_id를 가져와 시리얼라이저에 넣어줘 권한을 확인하기위해 get_serializer_context를 오버라이딩하여 사용했습니다.
+    def get_serializer_context(self):
+        context = super(TicketView, self).get_serializer_context()
+        context.update({"event": self.kwargs["event_id"]})
         return context
-    #위에 사용한 serializer_class를 가져와 serializer로 사용합니다. 시리얼라이저에 입력값을 넣고, 검증을 진행합니다   
+
+    # 위에 사용한 serializer_class를 가져와 serializer로 사용합니다. 시리얼라이저에 입력값을 넣고, 검증을 진행합니다
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         event_id = self.kwargs.get("event_id")
-        
-        #try문에서는 event_id를 통해 해당 id를 가진 공연정보가 있는지 확인합니다.
+
+        # try문에서는 event_id를 통해 해당 id를 가진 공연정보가 있는지 확인합니다.
         try:
             event = Event.objects.get(id=event_id)
         except Event.DoesNotExist:
-            return Response({"message": "유효한 이벤트를 선택해 주세요"}, status=status.HTTP_400_BAD_REQUEST)            
-        #통과 시 serializer_class에 요청한 데이터를 datada넣고, context(형식)에 event_id에는 해당 event_id, event에는 해당 event를 값으로 넣고 serializer로 보냅니다.
-        serializer = self.get_serializer(data=request.data, context={"event_id": event_id, "event": event})
-        
-        #TicketCreateSerializer에서 모든 검증을 통과하면 
-        #작성완료 메시지와 함께 상태메시지 201을 출력합니다, 통과하지 못한다면, 시리얼라이저에서 생성한 에러메시지와 상태메시지 400을 출력합니다.        
+            return Response(
+                {"message": "유효한 이벤트를 선택해 주세요"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        # 통과 시 serializer_class에 요청한 데이터를 datada넣고, context(형식)에 event_id에는 해당 event_id, event에는 해당 event를 값으로 넣고 serializer로 보냅니다.
+        serializer = self.get_serializer(
+            data=request.data, context={"event_id": event_id, "event": event}
+        )
+
+        # TicketCreateSerializer에서 모든 검증을 통과하면
+        # 작성완료 메시지와 함께 상태메시지 201을 출력합니다, 통과하지 못한다면, 시리얼라이저에서 생성한 에러메시지와 상태메시지 400을 출력합니다.
         if serializer.is_valid():
             serializer.save(author=request.user, event=event)
             return Response({"message": "작성완료"}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class TicketDetailView(APIView):
     """EventDetailView
@@ -234,12 +241,12 @@ class TicketDetailView(APIView):
         serializer = TicketSerializer(ticket)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
     def delete(self, request, ticket_id):
         ticket = get_object_or_404(Ticket, id=ticket_id)
         self.check_object_permissions(self.request, ticket)
         ticket.delete()
         return Response({"message": "삭제완료"}, status=status.HTTP_200_OK)
+
 
 class LikeView(APIView):
     """
@@ -262,7 +269,7 @@ class LikeView(APIView):
         else:
             event.likes.add(request.user)
             return Response({"message": "like했습니다."}, status=status.HTTP_200_OK)
-    
+
 
 class BookingTicketView(APIView):
     """
@@ -271,12 +278,13 @@ class BookingTicketView(APIView):
     """
 
     permission_classes = [permissions.IsAuthenticated]
-    #get_object를 사용하여 해당하는 티켓의 정보를 조회합니다.
+
+    # get_object를 사용하여 해당하는 티켓의 정보를 조회합니다.
     def get(self, request, ticket_id):
-            ticket = self.get_object(ticket_id)
-            serializer = BookedTicketSerializer(ticket)
-            return Response(serializer.data)
-                                        
+        ticket = self.get_object(ticket_id)
+        serializer = BookedTicketSerializer(ticket)
+        return Response(serializer.data)
+
     def get_object(self, ticket_id):
         """
         ticket_id를 이용해서 티켓 정보를 가져옵니다.
@@ -291,10 +299,10 @@ class BookingTicketView(APIView):
         """
         ticket_id를 이용해 티켓의 정보를 가져오는 get_object를 사용하여 티켓의 정보를 가져와 ticket에 넣습니다.
         serializer에 해당 ticket의 정보와 post요청을 보냅니다.
-        
+
         요청을 보낸 회원이 이미 예매한 티켓이라면, 예매를 취소하고, current_booking의 값에 -1을 합니다
         보낸 요청이 잘 끝나면, "예매가 취소되었습니다." 메시지와 상태메시지 200을 출력합니다.
-        
+
         요청을 보낸 회원이 예매하지 않은 티켓이라면, current_booking과 max_booking_count의 값을 비교합니다.
         current_booking의 값이 max_booking_count의 값보다 작다면
         예매가 진행되며, current_booking의 값에 +1을 하고 "예매가 완료되었습니다." 메시지와 상태메시지 200을 출력합니다.
@@ -303,7 +311,7 @@ class BookingTicketView(APIView):
         """
         ticket = self.get_object(ticket_id)
         serializer = BookedTicketCountSerializer(ticket, data=request.data)
-        
+
         if request.user in ticket.booked_users.all():
             ticket.booked_users.remove(request.user)
             serializer.instance.current_booking -= 1
@@ -311,14 +319,20 @@ class BookingTicketView(APIView):
             serializer.save()
             return Response({"message": "예매가 취소되었습니다."}, status=status.HTTP_200_OK)
         else:
-            if serializer.instance.current_booking >= serializer.instance.max_booking_count:
-                    return Response({"message": "매진되었습니다."}, status=status.HTTP_400_BAD_REQUEST)
-            else:                  
+            if (
+                serializer.instance.current_booking
+                >= serializer.instance.max_booking_count
+            ):
+                return Response(
+                    {"message": "매진되었습니다."}, status=status.HTTP_400_BAD_REQUEST
+                )
+            else:
                 ticket.booked_users.add(request.user)
                 serializer.instance.current_booking += 1
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
-                return Response({"message": "예매가 완료되었습니다."}, status=status.HTTP_200_OK)    
+                return Response({"message": "예매가 완료되었습니다."}, status=status.HTTP_200_OK)
+
 
 class BookingTicketListView(generics.ListAPIView):
     """
@@ -332,3 +346,15 @@ class BookingTicketListView(generics.ListAPIView):
         user = self.request.user
         booked_tickets = user.booked_tickets.all()
         return booked_tickets
+
+
+# 이벤트 북마크
+class EventBookmarkView(APIView):
+    def post(self, request, event_id):
+        event = get_object_or_404(Event, id=event_id)
+        if request.user in event.event_bookmarks.all():
+            event.event_bookmarks.remove(request.user)
+            return Response("북마크가 취소되었습니다.", status=status.HTTP_200_OK)
+        else:
+            event.event_bookmarks.add(request.user)
+            return Response("북마크 완료했습니다.", status=status.HTTP_200_OK)

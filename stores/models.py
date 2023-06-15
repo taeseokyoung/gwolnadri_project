@@ -33,6 +33,7 @@ class Store(models.Model):
         blank=True,
         null=True,
     )
+    store_bookmarks = models.ManyToManyField(User, related_name="bookmark_stores")
 
     def __str__(self):
         return self.store_name

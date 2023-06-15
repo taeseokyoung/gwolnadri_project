@@ -114,9 +114,6 @@ class HanbokDetailView(APIView):
 class PurchaseRecordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
-        pass
-
     def post(self, request, user_id):
         decomplete = PurchaseRecord.objects.filter(
             user_id=user_id, approved_at__isnull=True
@@ -149,3 +146,15 @@ class PutPurchaseRecordView(APIView):
             return Response({"message": "결제완료"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# 한복점 북마크
+class StoreBookmarkView(APIView):
+    def post(self, request, store_id):
+        store = get_object_or_404(Store, id=store_id)
+        if request.user in store.store_bookmarks.all():
+            store.store_bookmarks.remove(request.user)
+            return Response("북마크가 취소되었습니다.", status=status.HTTP_200_OK)
+        else:
+            store.store_bookmarks.add(request.user)
+            return Response("북마크 완료했습니다.", status=status.HTTP_200_OK)

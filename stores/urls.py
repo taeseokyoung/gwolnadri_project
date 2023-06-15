@@ -20,4 +20,9 @@ urlpatterns = [
         views.PutPurchaseRecordView.as_view(),
         name="put_purchase_record",
     ),
+    path(
+        "<int:store_id>/bookmark/",
+        views.StoreBookmarkView.as_view(),
+        name="bookmark_store_view",
+    ),
 ]
