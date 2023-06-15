@@ -1,11 +1,15 @@
 import os
 import requests
-from rest_framework import status, permissions
+from rest_framework import status, permissions, generics
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.shortcuts import redirect
+
+from rest_framework.generics import get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
+
 from django.http import JsonResponse
 from json.decoder import JSONDecodeError
 from dj_rest_auth.registration.views import SocialLoginView
@@ -19,13 +23,17 @@ from .serializers import (
     UserTokenObtainPairSerializer,
     UserSerializer,
     UserProfileSerializer,
+    UpdateUserSerializer, 
+    ChangePasswordSerializer,
 )
-
-from rest_framework.generics import get_object_or_404
 
 
 # 회원가입
-class SignUpView(APIView):
+class SignupView(APIView):
+    queryset = User.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = UserSerializer
+
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -33,12 +41,12 @@ class SignUpView(APIView):
             return Response({"message": "가입완료!"}, status=status.HTTP_201_CREATED)
         else:
             return Response(
-                {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST
-            )
+                {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # 로그인
 class LoginView(TokenObtainPairView):
+    permission_classes = (AllowAny,)
     serializer_class = UserTokenObtainPairSerializer
 
 
@@ -68,8 +76,39 @@ class Me(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-# 소셜로그인
 
+# 회원정보 수정하기, 탈퇴하기
+class UpdateProfileView(generics.UpdateAPIView):
+    def get_serializer_class(self):
+        if self.request.data.get('password'):
+            return ChangePasswordSerializer
+        return UpdateUserSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response({"message": "회원 탈퇴 완료"}, status=status.HTTP_204_NO_CONTENT)
+
+
+# 비밀번호 변경
+class ChangePasswordView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ChangePasswordSerializer
+
+    
+# 소셜로그인
 BASE_URL = "http://127.0.0.1:8000/"
 GOOGLE_CALLBACK_URI = BASE_URL + "users/google/login/callback/"
 KAKAO_CALLBACK_URI = BASE_URL + "users/kakao/login/callback/"
@@ -124,8 +163,6 @@ def google_callback(request):
     # 에러 아니면, get email
     email_req_json = email_req.json()
     email = email_req_json.get("email")
-
-    print(email_req_json)
 
     ## 회원가입/ 로그인
     try:

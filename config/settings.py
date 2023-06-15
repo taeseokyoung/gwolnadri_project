@@ -14,7 +14,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # env 설정 : SECRET_KEY
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-# DEBUG = False 는 소셜로그인 지정했음
+
+# DEBUG = False 는 소셜로그인
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
