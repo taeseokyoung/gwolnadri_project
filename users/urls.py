@@ -10,8 +10,9 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 
     path("me/", views.Me.as_view(), name="profile_view"),
-    path("me/modify/", views.UserView.as_view(), name="profile_modify"),
-    path("me/delete/", views.UserView.as_view(), name="uprofile_delete"),
+    path("me/modify/", views.UpdateProfileView.as_view(), name="profile_modify"),
+    path("me/delete/", views.UpdateProfileView.as_view(), name="profile_delete"),
+    path("me/<int:pk>/password/", views.ChangePasswordView.as_view(), name="change_password"),
 
     path('google/login/', views.google_login, name='google_login'),
     path('google/login/callback/', views.google_callback, name='google_callback'),

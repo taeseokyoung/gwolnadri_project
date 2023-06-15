@@ -1,6 +1,7 @@
 import os
 import requests
-from rest_framework import status, permissions
+from rest_framework import status, permissions, generics
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -15,11 +16,16 @@ from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.naver import views as naver_view
 from allauth.socialaccount.models import SocialAccount
 from .models import User
-from .serializers import UserTokenObtainPairSerializer, UserSerializer, UserUpdateSerializer
+from .serializers import UserTokenObtainPairSerializer, UserSerializer, UpdateUserSerializer, ChangePasswordSerializer, \
+    UserProfileSerializer
 
 
-# 회원가입, 수정, 회원탈퇴
+# 회원가입
 class SignupView(APIView):
+    queryset = User.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = UserSerializer
+
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -30,34 +36,9 @@ class SignupView(APIView):
                 {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserView(APIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def get(self, request, user_id):
-        user = get_object_or_404(User, id=user_id)
-        serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request, user_id):
-        user = get_object_or_404(User, id=user_id)
-        if request.user == user:
-            serializer = UserUpdateSerializer(user, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-
-    def delete(self, request):
-        user = request.user
-        user.delete()
-        return Response({"message": "회원 탈퇴 완료"}, status=status.HTTP_204_NO_CONTENT)
-
-
 # 로그인
 class LoginView(TokenObtainPairView):
+    permission_classes = (AllowAny,)
     serializer_class = UserTokenObtainPairSerializer
 
 
@@ -81,10 +62,41 @@ class Me(APIView):
     def get(self, request):
         user = request.user
         if user:
-            serializer = UserSerializer(user)
+            serializer = UserProfileSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+# 회원정보 수정하기, 탈퇴하기
+class UpdateProfileView(generics.UpdateAPIView):
+    def get_serializer_class(self):
+        if self.request.data.get('password'):
+            return ChangePasswordSerializer
+        return UpdateUserSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response({"message": "회원 탈퇴 완료"}, status=status.HTTP_204_NO_CONTENT)
+
+
+# 비밀번호 변경
+class ChangePasswordView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ChangePasswordSerializer
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""

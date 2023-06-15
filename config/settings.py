@@ -16,7 +16,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # env 설정 : SECRET_KEY
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-DEBUG = False
+# DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
