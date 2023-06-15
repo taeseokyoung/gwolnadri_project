@@ -152,7 +152,7 @@ class CommentDetailView(APIView):
         한복점 리뷰 수정
         """
         comment = get_object_or_404(HanbokComment, id=comment_id, store_id=store_id)
-        print("여기여기여기 : ", comment)
+
         if request.user == comment.user:
             serializer = CreateCommentSerializer(comment, data=request.data)
             if serializer.is_valid():
