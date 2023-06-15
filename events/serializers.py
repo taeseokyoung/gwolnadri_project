@@ -51,11 +51,9 @@ class EventSerializer(serializers.ModelSerializer):
         author = obj.author.email.split("@")[0]
         return author
 
-
     def get_review_count(self, obj):
         return obj.review_set.count()
-      
-      
+         
     likes_count = serializers.SerializerMethodField()
     def get_likes_count(self, obj):
         return obj.likes.count()
@@ -165,23 +163,24 @@ class TicketCreateSerializer(serializers.ModelSerializer):
     event_time(Char)
     max_booking_count(int)
     값을 입력 받습니다.
-    
+
     validate
     event_id를 사용하여 해당 공연이 있는지 확인합니다
     없을 시 "유효한 이벤트를 선택해 주세요" 메시지를 출력합니다
-    
+
     event_date
     event_start_date~event_end_date 사이의 값이 입력되었는지 확인합니다.
     YYYY-MM-DD 형태로 입력합니다.
-    
+
     event_time
     time_slots의 value를 탐색하여 입력된 event_time의 값이 있는지 확인합니다
     없을 시 "공연 시간을 확인해 주세요" 메시지를 출력합니다
-    
+
     max_booking_count
     Event 모델의 max_bookig의 값과 비교하여 같은지 확인합니다.
     다를 시 "최대 관객수를 확인해 주세요" 메시지를 출력합니다
     """
+
     event_date = serializers.DateField()
     event_time = serializers.CharField(max_length=11)
     booked_users = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
@@ -226,6 +225,7 @@ class TicketSerializer(serializers.ModelSerializer):
     """
     생성한 티켓의 정보를 확인할 때 사용되는 시리얼라이저 입니다.
     """
+
     class Meta:
         model = Ticket
         fields = "__all__"
@@ -235,6 +235,7 @@ class BookedTicketSerializer(serializers.ModelSerializer):
     """
     예약한 티켓의 정보를 확인할 때 사용되는 시리얼라이저 입니다.
     """
+
     event = serializers.SerializerMethodField()
     event_date = serializers.DateField()
     event_time = serializers.CharField()
@@ -244,7 +245,6 @@ class BookedTicketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-
         fields = (
             "event",
             "event_date",
@@ -257,11 +257,28 @@ class BookedTicketCountSerializer(serializers.ModelSerializer):
     티켓 예약을 위해 만들어진 시리얼라이저 입니다
     current_booking과 max_booking_count을 이용하여, 티켓의 예약 가능여부를 판단합니다
     """
+
     event = serializers.SerializerMethodField()
     current_booking = serializers.IntegerField(read_only=True)
     max_booking_count = serializers.IntegerField(read_only=True)
 
- 
     class Meta:
         model = Ticket
         fields = ("event", "current_booking", "max_booking_count")
+
+
+# 북마크용 Serializer
+class EventBookmarkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = (
+            "title",
+            "content",
+            "image",
+            "created_at",
+            "updated_at",
+            "event_start_date",
+            "event_end_date",
+            "likes",
+            "likes_count",
+        )

@@ -6,6 +6,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
+
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
     password2 = forms.CharField(
@@ -14,7 +15,9 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["email",]
+        fields = [
+            "email",
+        ]
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -30,18 +33,14 @@ class UserCreationForm(forms.ModelForm):
             user.save()
         return user
 
+
 class UserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField()
 
     class Meta:
         model = User
-        fields = [
-            "email",
-            "password",
-            "is_active",
-            "is_admin",
-            "is_staff"
-        ]
+        fields = ["email", "password", "is_active", "is_admin", "is_staff"]
+
 
 class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
@@ -59,7 +58,6 @@ class UserAdmin(BaseUserAdmin):
                 )
             },
         ),
-
         (
             "Permissions",
             {
