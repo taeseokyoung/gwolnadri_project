@@ -114,9 +114,6 @@ class HanbokDetailView(APIView):
 class PurchaseRecordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
-        pass
-
     def post(self, request, user_id):
         decomplete = PurchaseRecord.objects.filter(
             user_id=user_id, approved_at__isnull=True

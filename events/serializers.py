@@ -45,14 +45,20 @@ class EventSerializer(serializers.ModelSerializer):
     event_start_date = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
     event_end_date = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
     review_count = serializers.SerializerMethodField()
-    likes_count = serializers.SerializerMethodField()
+    
+    author = serializers.SerializerMethodField()
+    def get_author(self, obj):
+        author = obj.author.email.split("@")[0]
+        return author
 
     def get_review_count(self, obj):
         return obj.review_set.count()
-
+         
+    likes_count = serializers.SerializerMethodField()
     def get_likes_count(self, obj):
         return obj.likes.count()
 
+      
     class Meta:
         model = Event
         fields = (
@@ -185,6 +191,7 @@ class TicketCreateSerializer(serializers.ModelSerializer):
         event_date = attrs.get("event_date")
         event_time = attrs.get("event_time")
         max_booking_count = attrs.get("max_booking_count")
+
         try:
             event = Event.objects.get(id=event_id)
         except Event.DoesNotExist:
