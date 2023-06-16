@@ -28,6 +28,11 @@ urlpatterns = [
         name="put_purchase_record",
     ),
     path(
+        "payment/<int:user_id>/<tid>/",
+        views.DeletePurchaseRecordView.as_view(),
+        name="delete_purchase_record",
+    ),
+    path(
         "<int:store_id>/bookmark/",
         views.StoreBookmarkView.as_view(),
         name="bookmark_store_view",

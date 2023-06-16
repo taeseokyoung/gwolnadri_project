@@ -3,6 +3,7 @@ from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from users.models import User
 from .models import Store, Hanbok, HanbokComment, PurchaseRecord
 from .serializers import (
     StoreListSerializer,
@@ -251,6 +252,18 @@ class PutPurchaseRecordView(APIView):
             return Response({"message": "결제완료"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# 한복 예약 결제 취소 (DB 기록삭제)
+class DeletePurchaseRecordView(APIView):
+    def delete(self, request, user_id, tid):
+        user = get_object_or_404(User, id=user_id)
+        purchase_record = get_object_or_404(PurchaseRecord, tid=tid)
+        if request.user == user:
+            purchase_record.delete()
+            return Response({"message": "구매가 취소되었습니다."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "권한이 없습니다"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # 한복점 북마크
