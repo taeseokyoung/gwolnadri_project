@@ -12,6 +12,7 @@ from .serializers import (
     PurchaseRecordCreateSerializer,
     CommentSerializer,
     CreateCommentSerializer,
+    PurchaseRecordSerializer,
 )
 
 
@@ -107,7 +108,7 @@ class StoreDetailView(APIView):
                 {"message": "권한이 없거나 잘못된 요청입니다."}, status=status.HTTP_403_FORBIDDEN
             )
 
-          
+
 class CommentView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
@@ -205,13 +206,13 @@ class LikeView(APIView):
                 status=status.HTTP_200_OK,
             )
 
+
 # 한복 상세페이지
 class HanbokDetailView(APIView):
     def get(self, request, hanbok_id):
         hanbok = get_object_or_404(Hanbok, id=hanbok_id)
         serializer = HanbokSerializer(hanbok)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 
 # 결제 승인요청
@@ -237,7 +238,7 @@ class PurchaseRecordView(APIView):
 class PutPurchaseRecordView(APIView):
     def get(self, request, tid):
         purchase_record = get_object_or_404(PurchaseRecord, tid=tid)
-        serializer = PurchaseRecordCreateSerializer(purchase_record)
+        serializer = PurchaseRecordSerializer(purchase_record)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, tid):

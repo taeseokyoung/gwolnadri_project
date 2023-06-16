@@ -32,7 +32,6 @@ class Store(models.Model):
         User, related_name="bookmark_stores", blank=True
     )
 
-
     def __str__(self):
         return self.store_name
 
@@ -70,7 +69,7 @@ class Hanbok(models.Model):
     def __str__(self):
         return self.hanbok_name
 
-      
+
 class HanbokComment(models.Model):
 
     """
@@ -102,9 +101,11 @@ class HanbokComment(models.Model):
     def __str__(self):
         return self.content
 
+
 class PurchaseRecord(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tid = models.CharField(max_length=100)
+    type = models.CharField(max_length=10)
     partner_order_id = models.BigIntegerField()
     partner_user_id = models.CharField(max_length=50)
     item_name = models.CharField(max_length=50)
