@@ -31,4 +31,9 @@ urlpatterns = [
         views.BookingTicketListView.as_view(),
         name="booked_list_view",
     ),
+    path(
+        "<int:event_id>/bookmark/",
+        views.EventBookmarkView.as_view(),
+        name="bookmark_event_view",
+    ),
 ]
