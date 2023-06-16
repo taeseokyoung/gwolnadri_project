@@ -200,7 +200,7 @@ class TicketView(generics.ListCreateAPIView):
         #try문에서는 event_id를 통해 해당 id를 가진 공연정보가 있는지 확인합니다.
         try:
             event = Event.objects.get(id=event_id)
-        except Event.DoesNotExist:
+        except Event.DoesNotExist: 
             return Response({"message": "유효한 이벤트를 선택해 주세요"}, status=status.HTTP_400_BAD_REQUEST)            
         #통과 시 serializer_class에 요청한 데이터를 datada넣고, context(형식)에 event_id에는 해당 event_id, event에는 해당 event를 값으로 넣고 serializer로 보냅니다.
         serializer = self.get_serializer(data=request.data, context={"event_id": event_id, "event": event})
@@ -304,21 +304,20 @@ class BookingTicketView(APIView):
         ticket = self.get_object(ticket_id)
         serializer = BookedTicketCountSerializer(ticket, data=request.data)
         
-        if request.user in ticket.booked_users.all():
-            ticket.booked_users.remove(request.user)
-            serializer.instance.current_booking -= 1
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response({"message": "예매가 취소되었습니다."}, status=status.HTTP_200_OK)
-        else:
-            if serializer.instance.current_booking >= serializer.instance.max_booking_count:
-                    return Response({"message": "매진되었습니다."}, status=status.HTTP_400_BAD_REQUEST)
-            else:                  
-                ticket.booked_users.add(request.user)
-                serializer.instance.current_booking += 1
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response({"message": "예매가 완료되었습니다."}, status=status.HTTP_200_OK)    
+        quantity = request.data.get("quantity", 0)
+        current_booking = ticket.current_booking
+        max_booking_count = ticket.max_booking_count
+        
+        if current_booking + quantity > max_booking_count:
+            return Response({"message": "예매가 불가능합니다."}, status=status.HTTP_400_BAD_REQUEST)
+        if quantity == 0:
+            return Response({"message": "예매 수량(quantity)을 입력해주세요."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        ticket.booked_users.add(request.user)
+        ticket.current_booking += quantity
+        ticket.save()
+        
+        return Response({"message": "예매가 완료되었습니다."}, status=status.HTTP_200_OK)
 
 class BookingTicketListView(generics.ListAPIView):
     """

@@ -46,7 +46,11 @@ class EventSerializer(serializers.ModelSerializer):
     event_end_date = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
     review_count = serializers.SerializerMethodField()
     likes_count = serializers.SerializerMethodField()
+    author = serializers.SerializerMethodField()
 
+    def get_author(self, obj):
+        author = obj.author.email.split("@")[0]
+        return author
 
     def get_review_count(self, obj):
         return obj.review_set.count()
@@ -225,13 +229,15 @@ class BookedTicketSerializer(serializers.ModelSerializer):
     event = serializers.SerializerMethodField()
     event_date = serializers.DateField()
     event_time = serializers.CharField()
-
+    quantity = serializers.IntegerField()
+    money = serializers.IntegerField()
+    
     def get_event(self, ticket):
         return ticket.event.title 
     
     class Meta:
         model = Ticket
-        fields = ("event","event_date","event_time",)
+        fields = ("event","event_date","event_time","quantity", "money",)
 
 
 class BookedTicketCountSerializer(serializers.ModelSerializer):
@@ -242,9 +248,10 @@ class BookedTicketCountSerializer(serializers.ModelSerializer):
     event = serializers.SerializerMethodField()
     current_booking = serializers.IntegerField(read_only=True)
     max_booking_count = serializers.IntegerField(read_only=True)
-
+    money = serializers.SerializerMethodField()
+    quantity = serializers.SerializerMethodField()
  
     class Meta:
         model = Ticket
-        fields = ("event", "current_booking", "max_booking_count")
+        fields = ("event", "money", "quantity","current_booking", "max_booking_count")
  

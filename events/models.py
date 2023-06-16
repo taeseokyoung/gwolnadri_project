@@ -55,6 +55,8 @@ class Ticket(models.Model):
     booked_users = models.ManyToManyField(User, related_name="booked_tickets")
     max_booking_count = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     current_booking = models.PositiveIntegerField(default=0)
+    money = models.IntegerField()
+    quantity = models.IntegerField()
 
 class EventReview(models.Model):
     """
