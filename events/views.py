@@ -202,6 +202,7 @@ class TicketView(generics.ListCreateAPIView):
         # try문에서는 event_id를 통해 해당 id를 가진 공연정보가 있는지 확인합니다.
         try:
             event = Event.objects.get(id=event_id)
+            
         except Event.DoesNotExist:
             return Response(
                 {"message": "유효한 이벤트를 선택해 주세요"}, status=status.HTTP_400_BAD_REQUEST
@@ -213,6 +214,7 @@ class TicketView(generics.ListCreateAPIView):
 
         # TicketCreateSerializer에서 모든 검증을 통과하면
         # 작성완료 메시지와 함께 상태메시지 201을 출력합니다, 통과하지 못한다면, 시리얼라이저에서 생성한 에러메시지와 상태메시지 400을 출력합니다.
+
         if serializer.is_valid():
             serializer.save(author=request.user, event=event)
             return Response({"message": "작성완료"}, status=status.HTTP_201_CREATED)
@@ -310,28 +312,21 @@ class BookingTicketView(APIView):
         예매가 진행되지 않으며, "매진되었습니다." 메시지와 상태메시지 400을 출력합니다.
         """
         ticket = self.get_object(ticket_id)
-        serializer = BookedTicketCountSerializer(ticket, data=request.data)
-
-        if request.user in ticket.booked_users.all():
-            ticket.booked_users.remove(request.user)
-            serializer.instance.current_booking -= 1
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response({"message": "예매가 취소되었습니다."}, status=status.HTTP_200_OK)
-        else:
-            if (
-                serializer.instance.current_booking
-                >= serializer.instance.max_booking_count
-            ):
-                return Response(
-                    {"message": "매진되었습니다."}, status=status.HTTP_400_BAD_REQUEST
-                )
-            else:
-                ticket.booked_users.add(request.user)
-                serializer.instance.current_booking += 1
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response({"message": "예매가 완료되었습니다."}, status=status.HTTP_200_OK)
+        serializer = BookedTicketCountSerializer(ticket, data=request.data)    
+        quantity = request.data.get("quantity", 0)
+        current_booking = ticket.current_booking
+        max_booking_count = ticket.max_booking_count
+        
+        if current_booking + quantity > max_booking_count:
+            return Response({"message": "예매가 불가능합니다."}, status=status.HTTP_400_BAD_REQUEST)
+        if quantity == 0:
+            return Response({"message": "예매 수량(quantity)을 입력해주세요."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        ticket.booked_users.add(request.user)
+        ticket.current_booking += quantity
+        ticket.save()
+        
+        return Response({"message": "예매가 완료되었습니다."}, status=status.HTTP_200_OK)
 
 
 class BookingTicketListView(generics.ListAPIView):
