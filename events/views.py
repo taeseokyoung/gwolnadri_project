@@ -179,14 +179,15 @@ class TicketView(generics.ListCreateAPIView):
     CustomPermission는 permissions.py에서 커스텀한 권한입니다
     [시리얼라이저]
     serializer_class는 해당 클래스에서 사용할 serializer을 결정합니다.
-    [쿼리셋]
-    queryset을 사용하여 어떻게 가져올지 결정합니다.
-    Ticket모델의 모든 오브젝트를 가져와 get요청 시 보여줍니다.
     """
 
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, CustomPermission]
     serializer_class = TicketCreateSerializer
-    queryset = Ticket.objects.all()
+    #이벤트_id를 사용하여 해당 이벤트에 생성된 티켓을 조회합니다.
+    def get(self, request, event_id):
+        tickets = Ticket.objects.filter(event=event_id)
+        serializer = TicketSerializer(tickets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)        
 
     # 이벤트_id를 가져와 시리얼라이저에 넣어줘 권한을 확인하기위해 get_serializer_context를 오버라이딩하여 사용했습니다.
     def get_serializer_context(self):
@@ -250,6 +251,18 @@ class TicketDetailView(APIView):
         return Response({"message": "삭제완료"}, status=status.HTTP_200_OK)
 
 
+class TicketDateDetailView(APIView):
+    def get(self, request, event_id, event_date):
+        ticket = Ticket.objects.filter(event=event_id, event_date=str(event_date))
+        serializer = TicketSerializer(ticket, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)      
+
+class TicketTimeDetailView(APIView):
+    def get(self, request, event_id, event_date, event_time):
+        ticket = Ticket.objects.filter(event=event_id, event_date=str(event_date), event_time=str(event_time))
+        serializer = TicketSerializer(ticket, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)  
+    
 class LikeView(APIView):
     """
     게시글 좋아요 기능을 수행합니다.
