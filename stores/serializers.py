@@ -88,15 +88,7 @@ class HanbokSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Hanbok
-        fields = (
-            "id",
-            "store",
-            "owner",
-            "hanbok_name",
-            "hanbok_description",
-            "hanbok_price",
-            "hanbok_image",
-        )
+        fields = "__all__"
 
 
 # ✅ 한복상품등록 (제품명, 제품설명, 가격, 이미지)
@@ -144,6 +136,7 @@ class PurchaseRecordCreateSerializer(serializers.ModelSerializer):
         model = PurchaseRecord
         fields = [
             "tid",
+            "type",
             "partner_order_id",
             "partner_user_id",
             "item_name",
