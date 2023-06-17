@@ -30,11 +30,14 @@ urlpatterns = [
         "<int:event_id>/<str:event_date>/<str:event_time>/ticket/",
         views.TicketTimeDetailView.as_view(),
         name="ticket_time_detail_view",
-    ),    
+    ),
     path(
         "<int:ticket_id>/bookedticket/",
         views.BookingTicketView.as_view(),
         name="booking_ticket_view",
+    ),
+    path(
+        "<int:id>/bookedtickets/", views.BookingTicketDetailView.as_view(), name="booking_ticket_detail_view",
     ),
     path(
         "bookedlist/",

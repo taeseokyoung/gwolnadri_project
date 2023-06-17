@@ -48,21 +48,33 @@ class Ticket(models.Model):
     event_date(Date): 해당 공연의 날짜의 값을 가집니다. (해당 티켓을 사용할 수 있는 공연의 날짜)
                       11자로 표현해야 하며, HH:MM~HH:MM 으로 표현하면 됩니다(H:시간, M:분)
     event_time(Char): 해당 공연의 시간 값을 가집니다. (해당 티켓을 사용할 수 있는 공연의 시간)
-    booked_user(ManyToMany): 해당 티켓을 예매한 유저를 저장합니다.
     max_booking_count(PositiveInteger): 최대 관객 수를 표현합니다. 최소 1 이상의 int형 값을 넣어야 합니다.
     current_booking(PositiveInteger): 현재 예매한 인원의 수를 표현합니다.
+    money(int): 티켓의 가격을 표현합니다.
+    quantity(int): 구입 수량을 표현합니다, 해당 모델에서는 입력값으로 사용되지 않고, TicketBooking모델의 quantity의 값을 받아와, 연산에 사용됩니다.
     """
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     event_date = models.DateField()
     event_time = models.CharField(max_length=11)
-    booked_users = models.ManyToManyField(User, related_name="booked_tickets")
     max_booking_count = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     current_booking = models.PositiveIntegerField(default=0)
     money = models.IntegerField()
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(default=0)
 
+class TicketBooking(models.Model):
+    """
+    author(ForeignKey): 예약을 한 회원을 표현합니다.
+    ticket(ForeignKey): 예약 대상이 된 티켓의 id를 표현합니다
+    money(int): 티켓의 가격을 표현합니다.
+    quantity(int): 구입할 수량을 표현합니다
+    """
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    money = models.IntegerField()
+    quantity = models.IntegerField(default=0)
+    
 
 class EventReview(models.Model):
     """
