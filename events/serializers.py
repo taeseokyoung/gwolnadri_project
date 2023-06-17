@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from events.models import Event, EventReview, Ticket
+from events.models import Event, EventReview, Ticket, TicketBooking
 from users.models import User
-
+from datetime import datetime
 
 class EventCreateSerializer(serializers.ModelSerializer):
     """
@@ -236,21 +236,25 @@ class TicketSerializer(serializers.ModelSerializer):
 
 class BookedTicketSerializer(serializers.ModelSerializer):
     """
-    예약한 티켓의 정보를 확인할 때 사용되는 시리얼라이저 입니다.
+    예약한 티켓을 조회하기 위해 사용됩니다.
     """
-
     event = serializers.SerializerMethodField()
-    event_date = serializers.DateField()
-    event_time = serializers.CharField()
-    quantity = serializers.IntegerField()
-    money = serializers.IntegerField()
-    
-    def get_event(self, ticket):
-        return ticket.event.title
+    event_date = serializers.SerializerMethodField()
+    event_time = serializers.SerializerMethodField()
+    quantity = serializers.IntegerField(min_value=1)
+
+    def get_event(self, ticket_booking):
+        return ticket_booking.ticket.event.title
+
+    def get_event_date(self, ticket_booking):
+        return ticket_booking.ticket.event_date.strftime("%m월%d일 %H:%M")
+
+    def get_event_time(self, ticket_booking):
+        return ticket_booking.ticket.event_time
 
     class Meta:
-        model = Ticket
-        fields = ("event","event_date","event_time","quantity", "money",)
+        model = TicketBooking
+        fields = ("event", "event_date", "event_time", "quantity", "money",)
 
 
 
@@ -259,16 +263,34 @@ class BookedTicketCountSerializer(serializers.ModelSerializer):
     티켓 예약을 위해 만들어진 시리얼라이저 입니다
     current_booking과 max_booking_count을 이용하여, 티켓의 예약 가능여부를 판단합니다
     """
-
+    author = serializers.SerializerMethodField()
     event = serializers.SerializerMethodField()
     current_booking = serializers.IntegerField(read_only=True)
     max_booking_count = serializers.IntegerField(read_only=True)
-    money = serializers.SerializerMethodField()
+    money = serializers.SerializerMethodField(read_only=True)
     quantity = serializers.SerializerMethodField()
- 
+
+    def get_current_booking(self, ticket):
+        return ticket.current_booking
+
+    def get_max_booking_count(self, ticket):
+        return ticket.max_booking_count
+
+    def get_author(self, ticket_booking):
+        return ticket_booking.author.username
+
+    def get_event(self, ticket_booking):
+        return ticket_booking.ticket.event.title
+
+    def get_money(self, ticket_booking):
+        return ticket_booking.ticket.money
+
+    def get_quantity(self, ticket_booking):
+        return ticket_booking.quantity
+
     class Meta:
-        model = Ticket
-        fields = ("event", "money", "quantity","current_booking", "max_booking_count")
+        model = TicketBooking
+        fields = ("author", "event", "money", "quantity", "current_booking", "max_booking_count")
  
 
 # 북마크용 Serializer

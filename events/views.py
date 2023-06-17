@@ -3,7 +3,7 @@ from rest_framework import status, permissions, generics
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
-from events.models import Event, EventReview, Ticket
+from events.models import Event, EventReview, Ticket, TicketBooking
 from rest_framework import filters
 from events.permissons import CustomPermission, IsOwnerOrReadOnly
 from events.serializers import (
@@ -252,12 +252,27 @@ class TicketDetailView(APIView):
 
 
 class TicketDateDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    """
+    공연id, 공연날짜를 이용하여, 해당 값에 맞는 티켓의 정보를 조회합니다.
+    로그인한 회원만 사용가능합니다.
+    event_date의 타입이 date 타입이기 때문에 url에서 사용하기 위해서 event_date의 타입은 str형으로 사용되어야 합니다.
+    """
     def get(self, request, event_id, event_date):
         ticket = Ticket.objects.filter(event=event_id, event_date=str(event_date))
         serializer = TicketSerializer(ticket, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)      
 
 class TicketTimeDetailView(APIView):
+    """
+    공연id, 공연날짜, 공연 시간을 이용하여, 해당 값에 맞는 티켓의 정보를 조회합니다.
+    로그인한 회원만 사용가능합니다.
+    event_date의 타입이 date 타입이기 때문에 url에서 사용하기 위해서 event_date의 타입은 str형으로 사용되어야 합니다.    
+    event_time의 타입이 varchar 타입이기 때문에 url에서 사용하기 위해서 event_time의 타입은 str형으로 사용되어야 합니다.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    
     def get(self, request, event_id, event_date, event_time):
         ticket = Ticket.objects.filter(event=event_id, event_date=str(event_date), event_time=str(event_time))
         serializer = TicketSerializer(ticket, many=True)
@@ -286,60 +301,74 @@ class LikeView(APIView):
             return Response({"message": "like했습니다."}, status=status.HTTP_200_OK)
 
 
-class BookingTicketView(APIView):
+class BookingTicketDetailView(APIView):
     """
-    티켓_id를 사용하여, 해당 티켓을 조회, 예약, 예약 취소 기능을 합니다
-    IsAuthenticated를 사용하여, 로그인한 회원만 사용가능합니다.
+    예매한 티켓을 조회하기 위해 사용됩니다.
+    id는 예약항목의 id를 나타냅니다.
+    조회하는 회원의 예약항목의 id를 사용하여, 해당 id를 가진 티켓의 정보를 조회합니다.
     """
-
     permission_classes = [permissions.IsAuthenticated]
 
-    # get_object를 사용하여 해당하는 티켓의 정보를 조회합니다.
-    def get(self, request, ticket_id):
-        ticket = self.get_object(ticket_id)
-        serializer = BookedTicketSerializer(ticket)
-        return Response(serializer.data)
-
-    def get_object(self, ticket_id):
-        """
-        ticket_id를 이용해서 티켓 정보를 가져옵니다.
-        예약한 티켓이 없다면 예외처리를 통해 "예매한 티켓이 없습니다" 메시지와 상태메시지 404를 출력합니다.
-        """
+    def get(self, request, id):
         try:
-            return Ticket.objects.get(id=ticket_id)
-        except Ticket.DoesNotExist:
-            raise NotFound(detail="예매한 티켓이 없습니다.", code=status.HTTP_404_NOT_FOUND)
+            user = self.request.user
+            ticket_booking = TicketBooking.objects.filter(id=id, author=user).first()
+            if not ticket_booking:
+                return Response({"message": "예매한 티켓이 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = BookedTicketSerializer(ticket_booking)
+            return Response(serializer.data)
+        except TicketBooking.DoesNotExist:
+            return Response({"message": "예매한 티켓이 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+class BookingTicketView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
 
     def post(self, request, ticket_id):
         """
-        ticket_id를 이용해 티켓의 정보를 가져오는 get_object를 사용하여 티켓의 정보를 가져와 ticket에 넣습니다.
-        serializer에 해당 ticket의 정보와 post요청을 보냅니다.
-
-        요청을 보낸 회원이 이미 예매한 티켓이라면, 예매를 취소하고, current_booking의 값에 -1을 합니다
-        보낸 요청이 잘 끝나면, "예매가 취소되었습니다." 메시지와 상태메시지 200을 출력합니다.
-
-        요청을 보낸 회원이 예매하지 않은 티켓이라면, current_booking과 max_booking_count의 값을 비교합니다.
-        current_booking의 값이 max_booking_count의 값보다 작다면
-        예매가 진행되며, current_booking의 값에 +1을 하고 "예매가 완료되었습니다." 메시지와 상태메시지 200을 출력합니다.
-        current_booking의 값이 max_booking_count의 값보다 크거나 같다면
-        예매가 진행되지 않으며, "매진되었습니다." 메시지와 상태메시지 400을 출력합니다.
+        예매를 진행하기 위해 사용됩니다.
+        ticket_id를 받아 해당 티켓이 존재하는지 먼저 확인합니다
+        해당, 티켓이 존재하지 않는다면, "티켓이 존재하지 않습니다." 메시지와 404 상태메시지를 출력합니다
+        
+        시리얼라이저를 통해 입력값이 정확한 형태로 들어왔는지 확인합니다
+        quantity의 값을 0 이하로 입력할 시 "올바른 수량(quantity)을 입력해주세요." 메시지와 400 상태메시지를 출력합니다
+        current_booking(현재 예매된 티켓의 수량)의 값이 quantity(예매하고자 하는 수량)을 더하여 max_booking_count(최대 수량)을 넘을 경우
+        "예매가 불가능합니다." 메시지와 400 상태메시지를 출력합니다
+        
+        예매가 가능한 상황이라면, current_booking에 quantity 값을 더해주고, 더해준 값을 해당 티켓에 저장해주고, 예매 내역을 ticket_booking에 저장해주고
+        "예매가 완료되었습니다." 메시지와 201 상태메시지를 출력합니다.
         """
-        ticket = self.get_object(ticket_id)
-        serializer = BookedTicketCountSerializer(ticket, data=request.data)    
-        quantity = request.data.get("quantity", 0)
-        current_booking = ticket.current_booking
-        max_booking_count = ticket.max_booking_count
+        try:
+            ticket = Ticket.objects.get(id=ticket_id)
+        except Ticket.DoesNotExist:
+            return Response({"message": "티켓이 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
         
-        if current_booking + quantity > max_booking_count:
-            return Response({"message": "예매가 불가능합니다."}, status=status.HTTP_400_BAD_REQUEST)
-        if quantity == 0:
-            return Response({"message": "예매 수량(quantity)을 입력해주세요."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        ticket.booked_users.add(request.user)
-        ticket.current_booking += quantity
-        ticket.save()
-        
-        return Response({"message": "예매가 완료되었습니다."}, status=status.HTTP_200_OK)
+
+        serializer = BookedTicketCountSerializer(data=request.data)
+        if serializer.is_valid():
+            quantity = request.data.get("quantity", 0)
+            if quantity is None or quantity <= 0:
+                return Response({"message": "올바른 수량(quantity)을 입력해주세요."}, status=status.HTTP_400_BAD_REQUEST)
+            if ticket.current_booking + quantity > ticket.max_booking_count:
+                return Response({"message": "예매가 불가능합니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+            ticket_booking = TicketBooking(
+                author=request.user,
+                ticket=ticket,
+                money=ticket.money,
+                quantity=quantity
+            )
+            ticket.current_booking += quantity
+            ticket.save()
+            ticket_booking.save()
+
+            serializer = BookedTicketCountSerializer(ticket_booking)
+            return Response({"message": "예매가 완료되었습니다."}, status=status.HTTP_201_CREATED)
+
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BookingTicketListView(generics.ListAPIView):
@@ -352,7 +381,7 @@ class BookingTicketListView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        booked_tickets = user.booked_tickets.all()
+        booked_tickets = TicketBooking.objects.filter(author=user)
         return booked_tickets
 
 
