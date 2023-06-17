@@ -18,7 +18,7 @@ def get_location(address):
     return result
 
 
-# ✅ 한복집 리스트 (id, 판매자, 가게이름, 가게주소, x좌표, y좌표, 전체 좋아요 수, 평균 별점)
+# ✅ 한복집 리스트 (id, 판매자, 가게이름, 가게주소, x좌표, y좌표, 전체 좋아요 수, 평균 별점, 북마크)
 class StoreListSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     total_likes = serializers.SerializerMethodField()
@@ -47,6 +47,7 @@ class StoreListSerializer(serializers.ModelSerializer):
             "likes",
             "total_likes",
             "avg_stars",
+            "store_bookmarks",
         )
 
 
