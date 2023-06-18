@@ -15,8 +15,13 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 
-# DEBUG = False 는 소셜로그인
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "0") == "1"
+
+
+ALLOWED_HOSTS = [
+    "backend",
+]
+
 
 ALLOWED_HOSTS = ["*"]
 
@@ -83,17 +88,41 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 
 # Database = postgresql 12 / env
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME"),
-        "USER": os.environ.get("DB_USER"),
-        "PASSWORD": os.environ.get("DB_PASSWORD"),
-        "HOST": os.environ.get("DB_HOST"),
-        # 'HOST': '127.0.0.1',
-        "PORT": os.environ.get("DB_PORT"),
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": os.environ.get("DB_NAME"),
+#         "USER": os.environ.get("DB_USER"),
+#         "PASSWORD": os.environ.get("DB_PASSWORD"),
+#         "HOST": os.environ.get("DB_HOST"),
+#         # 'HOST': '127.0.0.1',
+#         "PORT": os.environ.get("DB_PORT"),
+#     }
+# }
+
+
+# postgres 환경변수가 존재 할 경우에 postgres db에 연결을 시도합니다.
+POSTGRES_DB = os.environ.get("POSTGRES_DB", "")
+if POSTGRES_DB:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": POSTGRES_DB,
+            "USER": os.environ.get("POSTGRES_USER", ""),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
+            "HOST": os.environ.get("POSTGRES_HOST", ""),
+            "PORT": os.environ.get("POSTGRES_PORT", ""),
+        }
     }
-}
+
+# 환경변수가 존재하지 않을 경우 sqlite3을 사용합니다.
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
@@ -190,8 +219,9 @@ SIMPLE_JWT = {
 }
 
 
-# cors
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ORIGIN_WHITELIST = ["http://13.124.238.237"]
+
+CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 
 SITE_ID = 1
 
