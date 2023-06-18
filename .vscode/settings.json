@@ -1,3 +1,4 @@
+// Gwolnadri v0.1.1
 {
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
