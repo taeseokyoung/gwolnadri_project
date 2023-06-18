@@ -43,8 +43,8 @@ class EventSerializer(serializers.ModelSerializer):
 
     created_at = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
     updated_at = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
-    event_start_date = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
-    event_end_date = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
+    event_start_date = serializers.DateTimeField(read_only=True)
+    event_end_date = serializers.DateTimeField(read_only=True)
     review_count = serializers.SerializerMethodField()
 
     likes_count = serializers.SerializerMethodField()
