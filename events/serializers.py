@@ -3,6 +3,7 @@ from events.models import Event, EventReview, Ticket, TicketBooking
 from users.models import User
 from datetime import datetime
 
+
 class EventCreateSerializer(serializers.ModelSerializer):
     """
     공연정보를 작성하기 위해 사용합니다.
@@ -49,19 +50,18 @@ class EventSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     author = serializers.SerializerMethodField()
 
-
     def get_author(self, obj):
         author = obj.author.email.split("@")[0]
         return author
 
     def get_review_count(self, obj):
         return obj.review_set.count()
-         
+
     likes_count = serializers.SerializerMethodField()
+
     def get_likes_count(self, obj):
         return obj.likes.count()
 
-      
     class Meta:
         model = Event
         fields = (
@@ -238,6 +238,7 @@ class BookedTicketSerializer(serializers.ModelSerializer):
     """
     예약한 티켓을 조회하기 위해 사용됩니다.
     """
+
     event = serializers.SerializerMethodField()
     event_date = serializers.SerializerMethodField()
     event_time = serializers.SerializerMethodField()
@@ -254,8 +255,13 @@ class BookedTicketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TicketBooking
-        fields = ("event", "event_date", "event_time", "quantity", "money",)
-
+        fields = (
+            "event",
+            "event_date",
+            "event_time",
+            "quantity",
+            "money",
+        )
 
 
 class BookedTicketCountSerializer(serializers.ModelSerializer):
@@ -263,6 +269,7 @@ class BookedTicketCountSerializer(serializers.ModelSerializer):
     티켓 예약을 위해 만들어진 시리얼라이저 입니다
     current_booking과 max_booking_count을 이용하여, 티켓의 예약 가능여부를 판단합니다
     """
+
     author = serializers.SerializerMethodField()
     event = serializers.SerializerMethodField()
     current_booking = serializers.IntegerField(read_only=True)
@@ -290,8 +297,15 @@ class BookedTicketCountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TicketBooking
-        fields = ("author", "event", "money", "quantity", "current_booking", "max_booking_count")
- 
+        fields = (
+            "author",
+            "event",
+            "money",
+            "quantity",
+            "current_booking",
+            "max_booking_count",
+        )
+
 
 # 북마크용 Serializer
 class EventBookmarkSerializer(serializers.ModelSerializer):

@@ -37,7 +37,9 @@ urlpatterns = [
         name="booking_ticket_view",
     ),
     path(
-        "<int:id>/bookedtickets/", views.BookingTicketDetailView.as_view(), name="booking_ticket_detail_view",
+        "<int:id>/bookedtickets/",
+        views.BookingTicketDetailView.as_view(),
+        name="booking_ticket_detail_view",
     ),
     path(
         "bookedlist/",
