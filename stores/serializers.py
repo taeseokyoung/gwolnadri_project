@@ -77,11 +77,7 @@ class CreateStoreSerializer(serializers.ModelSerializer):
 
 # ✅ 한복상품정보 (제품명, 제품설명, 가격, 이미지)
 class HanbokSerializer(serializers.ModelSerializer):
-    store = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
-
-    def get_store(self, obj):
-        return obj.store.store_name
 
     def get_owner(self, obj):
         owner = obj.owner.email.split("@")[0]
