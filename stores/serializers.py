@@ -72,11 +72,7 @@ class CreateStoreSerializer(serializers.ModelSerializer):
 
 
 class HanbokSerializer(serializers.ModelSerializer):
-    store = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
-
-    def get_store(self, obj):
-        return obj.store.store_name
 
     def get_owner(self, obj):
         owner = obj.owner.email.split("@")[0]
