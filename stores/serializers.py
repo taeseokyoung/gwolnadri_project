@@ -99,11 +99,17 @@ class CreateHanbokSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+
+    def get_username(self, obj):
+        return obj.user.username
+
     class Meta:
         model = HanbokComment
         fields = [
             "id",
             "store",
+            "username",
             "user",
             "content",
             "review_image",
