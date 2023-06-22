@@ -2,6 +2,9 @@ from pathlib import Path
 import os
 import environ
 
+# rest_framework and simple jwt
+from datetime import timedelta
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -15,12 +18,9 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 
-DEBUG = os.environ.get("DEBUG", "0") == "1"
+# DEBUG = False 는 소셜로그인
+DEBUG = True
 
-
-ALLOWED_HOSTS = [
-    "backend",
-]
 
 # Application definition
 INSTALLED_APPS = [
@@ -84,41 +84,17 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 
 # Database = postgresql 12 / env
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": os.environ.get("DB_NAME"),
-#         "USER": os.environ.get("DB_USER"),
-#         "PASSWORD": os.environ.get("DB_PASSWORD"),
-#         "HOST": os.environ.get("DB_HOST"),
-#         # 'HOST': '127.0.0.1',
-#         "PORT": os.environ.get("DB_PORT"),
-#     }
-# }
-
-
-# postgres 환경변수가 존재 할 경우에 postgres db에 연결을 시도합니다.
-POSTGRES_DB = os.environ.get("POSTGRES_DB", "")
-if POSTGRES_DB:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": POSTGRES_DB,
-            "USER": os.environ.get("POSTGRES_USER", ""),
-            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
-            "HOST": os.environ.get("POSTGRES_HOST", ""),
-            "PORT": os.environ.get("POSTGRES_PORT", ""),
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        # 'HOST': '127.0.0.1',
+        "PORT": os.environ.get("DB_PORT"),
     }
-
-# 환경변수가 존재하지 않을 경우 sqlite3을 사용합니다.
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+}
 
 
 # Password validation
@@ -165,9 +141,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 
 
-# rest_framework and simple jwt
-from datetime import timedelta
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -181,7 +154,7 @@ SIMPLE_JWT = {
     # Pay Load 재정의
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.MyTokenObtainPairSerializer",
     # access_token 유효시간 배포 시 수정
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=3000),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
@@ -215,9 +188,8 @@ SIMPLE_JWT = {
 }
 
 
-CORS_ORIGIN_WHITELIST = ["http://13.124.238.237"]
-
-CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
+# cors
+CORS_ALLOW_ALL_ORIGINS = True
 
 SITE_ID = 1
 
