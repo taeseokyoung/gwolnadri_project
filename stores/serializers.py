@@ -106,11 +106,17 @@ class CreateHanbokSerializer(serializers.ModelSerializer):
 
 # ✅ 한복점 리뷰 열람 (후기내용, 후기사진, 평점, 생성일, 수정일)
 class CommentSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+
+    def get_username(self, obj):
+        return obj.user.username
+
     class Meta:
         model = HanbokComment
         fields = [
             "id",
             "store",
+            "username",
             "user",
             "content",
             "review_image",
