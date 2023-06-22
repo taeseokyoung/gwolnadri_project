@@ -43,8 +43,8 @@ class EventSerializer(serializers.ModelSerializer):
 
     created_at = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
     updated_at = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
-    event_start_date = serializers.DateTimeField(read_only=True)
-    event_end_date = serializers.DateTimeField(read_only=True)
+    event_start_date = serializers.DateTimeField(format="%y.%m.%d", read_only=True)
+    event_end_date = serializers.DateTimeField(format="%y.%m.%d", read_only=True)
     review_count = serializers.SerializerMethodField()
 
     likes_count = serializers.SerializerMethodField()
@@ -65,6 +65,7 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = (
+            "id",
             "author",
             "title",
             "content",
@@ -98,11 +99,13 @@ class EventListSerializer(EventSerializer):
 
         model = Event
         fields = (
+            "id",
             "title",
             "event_start_date",
             "event_end_date",
             "review_count",
             "likes_count",
+            "image",
             "event_bookmarks",
         )
 
@@ -140,10 +143,25 @@ class EventReviewSerializer(serializers.ModelSerializer):
 
     created_at = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
     updated_at = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
+    author_name = serializers.SerializerMethodField()
+
+    def get_author_name(self, obj):
+        # author_name = obj.author.username
+        return obj.author.username
 
     class Meta:
         model = EventReview
-        fields = "__all__"
+        fields = (
+            "id",
+            "author",
+            "author_name",
+            "event",
+            "content",
+            "review_image",
+            "created_at",
+            "updated_at",
+            "grade",
+        )
 
 
 class EventReviewCreateSerializer(serializers.ModelSerializer):
@@ -158,6 +176,7 @@ class EventReviewCreateSerializer(serializers.ModelSerializer):
         fields = (
             "content",
             "grade",
+            "review_image",
         )
 
 

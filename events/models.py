@@ -63,6 +63,7 @@ class Ticket(models.Model):
     money = models.IntegerField()
     quantity = models.IntegerField(default=0)
 
+
 class TicketBooking(models.Model):
     """
     author(ForeignKey): 예약을 한 회원을 표현합니다.
@@ -70,11 +71,12 @@ class TicketBooking(models.Model):
     money(int): 티켓의 가격을 표현합니다.
     quantity(int): 구입할 수량을 표현합니다
     """
+
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
     money = models.IntegerField()
     quantity = models.IntegerField(default=0)
-    
+
 
 class EventReview(models.Model):
     """
