@@ -51,4 +51,9 @@ urlpatterns = [
         views.EventBookmarkView.as_view(),
         name="bookmark_event_view",
     ),
+    path(
+        "list/",
+        views.EventListView.as_view(),
+        name="event_list_view",
+    ),
 ]

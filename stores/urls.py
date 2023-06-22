@@ -1,7 +1,6 @@
 from django.urls import path
 from stores import views
 
-
 urlpatterns = [
     path("", views.StoreListView.as_view(), name="store_list"),
     path("<int:store_id>/", views.StoreDetailView.as_view(), name="store_detail_view"),
@@ -29,12 +28,22 @@ urlpatterns = [
     ),
     path(
         "payment/<int:user_id>/<tid>/",
-        views.DeletePurchaseRecordView.as_view(),
-        name="delete_purchase_record",
+        views.GetPurchaseRecordView.as_view(),
+        name="get_purchase_record",
     ),
     path(
         "<int:store_id>/bookmark/",
         views.StoreBookmarkView.as_view(),
         name="bookmark_store_view",
+    ),
+    path(
+        "payment/<int:user_id>/hanbok/",
+        views.HanbokPurchaseRecordView.as_view(),
+        name="hanbok_purchase_record",
+    ),
+    path(
+        "payment/<int:user_id>/event/",
+        views.EventPurchaseRecordView.as_view(),
+        name="event_purchase_record",
     ),
 ]
