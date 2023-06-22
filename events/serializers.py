@@ -65,6 +65,7 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = (
+            "id",
             "author",
             "title",
             "content",
@@ -80,7 +81,6 @@ class EventSerializer(serializers.ModelSerializer):
             "review_count",
             "likes_count",
             "event_bookmarks",
-            "id",
         )
 
 
@@ -99,6 +99,7 @@ class EventListSerializer(EventSerializer):
 
         model = Event
         fields = (
+            "id",
             "title",
             "event_start_date",
             "event_end_date",
@@ -106,7 +107,6 @@ class EventListSerializer(EventSerializer):
             "likes_count",
             "image",
             "event_bookmarks",
-            "id",
         )
 
 
