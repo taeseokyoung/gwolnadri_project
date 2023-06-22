@@ -1,28 +1,19 @@
 from pathlib import Path
 import os
 import environ
+from datetime import timedelta
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # env 설정 : SECRET_KEY, DB
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
-
-# env 설정 : SECRET_KEY
 SECRET_KEY = os.environ.get("SECRET_KEY")
-
-
 DEBUG = os.environ.get("DEBUG", "0") == "1"
+ALLOWED_HOSTS = ["backend"]
 
-
-ALLOWED_HOSTS = [
-    "backend",
-]
-
-# Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -82,22 +73,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
-# Database = postgresql 12 / env
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": os.environ.get("DB_NAME"),
-#         "USER": os.environ.get("DB_USER"),
-#         "PASSWORD": os.environ.get("DB_PASSWORD"),
-#         "HOST": os.environ.get("DB_HOST"),
-#         # 'HOST': '127.0.0.1',
-#         "PORT": os.environ.get("DB_PORT"),
-#     }
-# }
-
-
-# postgres 환경변수가 존재 할 경우에 postgres db에 연결을 시도합니다.
 POSTGRES_DB = os.environ.get("POSTGRES_DB", "")
 if POSTGRES_DB:
     DATABASES = {
@@ -111,7 +86,6 @@ if POSTGRES_DB:
         }
     }
 
-# 환경변수가 존재하지 않을 경우 sqlite3을 사용합니다.
 else:
     DATABASES = {
         "default": {
@@ -120,8 +94,6 @@ else:
         }
     }
 
-
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -137,36 +109,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
 LANGUAGE_CODE = "ko-kr"
-
 TIME_ZONE = "Asia/Seoul"
-
 USE_I18N = True
-
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
-
-
-# media
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
-
-
-# Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-# auth user
 AUTH_USER_MODEL = "users.User"
-
-
-# rest_framework and simple jwt
-from datetime import timedelta
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -175,13 +126,9 @@ REST_FRAMEWORK = {
 }
 
 REST_USE_JWT = True
-
-
 SIMPLE_JWT = {
-    # Pay Load 재정의
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.MyTokenObtainPairSerializer",
-    # access_token 유효시간 배포 시 수정
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=3600),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
@@ -214,13 +161,9 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
-
-CORS_ORIGIN_WHITELIST = ["http://13.124.238.237"]
-
+CORS_ORIGIN_WHITELIST = ["http://3.34.183.59"]
 CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
-
 SITE_ID = 1
-
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True

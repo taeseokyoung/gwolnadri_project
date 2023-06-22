@@ -23,7 +23,7 @@ from .serializers import (
     UserTokenObtainPairSerializer,
     UserSerializer,
     UserProfileSerializer,
-    UpdateUserSerializer, 
+    UpdateUserSerializer,
     ChangePasswordSerializer,
 )
 
@@ -41,7 +41,8 @@ class SignupView(APIView):
             return Response({"message": "가입완료!"}, status=status.HTTP_201_CREATED)
         else:
             return Response(
-                {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
+                {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 # 로그인
@@ -76,11 +77,10 @@ class Me(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-
 # 회원정보 수정하기, 탈퇴하기
 class UpdateProfileView(generics.UpdateAPIView):
     def get_serializer_class(self):
-        if self.request.data.get('password'):
+        if self.request.data.get("password"):
             return ChangePasswordSerializer
         return UpdateUserSerializer
 
@@ -88,12 +88,12 @@ class UpdateProfileView(generics.UpdateAPIView):
         return self.request.user
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        return Response(serializer.data)
+        Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request):
         user = request.user
@@ -107,7 +107,7 @@ class ChangePasswordView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ChangePasswordSerializer
 
-    
+
 # 소셜로그인
 BASE_URL = "http://127.0.0.1:8000/"
 GOOGLE_CALLBACK_URI = BASE_URL + "users/google/login/callback/"
