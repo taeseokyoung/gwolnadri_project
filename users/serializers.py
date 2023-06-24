@@ -4,7 +4,7 @@ from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.password_validation import validate_password
 from stores.serializers import StoreListSerializer
-from events.serializers import EventBookmarkSerializer
+from events.serializers import EventSerializer
 
 
 # 회원가입
