@@ -4,27 +4,13 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Store(models.Model):
-    """
-    Store 모델
-    한복 상점 정보를 담습니다.
-
-    Attributes:
-    owner (Foreignkey): owner_id(판매자)의 값을 가집니다
-    store_name (varchar): 상점이름, 50자 제한
-    store_address (varchar): 상점주소, 255자 제한
-    location_x (Float): 상점 x좌표
-    location_y(Float): 상점 y좌표
-    star (positiveInt): 별점 1~5 값                -----**평균별점값으로 변경필요!!----
-    """
-
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        # related_name="stores",
         verbose_name="판매자",
     )
     store_name = models.CharField("상점이름", max_length=50)
-    store_address = models.CharField("상점주소", max_length=255, unique=True)
+    store_address = models.CharField("상점주소", max_length=500, unique=True)
     location_x = models.FloatField("x좌표", blank=True, null=True)
     location_y = models.FloatField("y좌표", blank=True, null=True)
     likes = models.ManyToManyField(User, related_name="like_stores")
@@ -37,24 +23,9 @@ class Store(models.Model):
 
 
 class Hanbok(models.Model):
-
-    """
-    Hanbok 모델
-    한복 상품 정보를 담습니다.
-
-    Attributes:
-    store (Foreignkey): store_id(한복가게 id)의 값을 가집니다
-    owner (Foreignkey): owner_id(판매자)의 값을 가집니다
-    hanbok_name (varChar): 제품명, 255자 제한
-    hanbok_description (varChar): 제품설명
-    hanbok_price (positiveInt): 가격
-    hanbok_image (Image) : 제품별 이미지 1장 (media/hanbok 폴더에 저장)
-    """
-
     store = models.ForeignKey(
         Store,
         on_delete=models.CASCADE,
-        # related_name="store",
         verbose_name="한복점",
     )
     owner = models.ForeignKey(
@@ -71,21 +42,6 @@ class Hanbok(models.Model):
 
 
 class HanbokComment(models.Model):
-
-    """
-    HanbokComment 모델
-    한복점 후기 정보를 담습니다.
-
-    Attributes:
-    store (Foreignkey): store_id(한복가게 id)의 값을 가집니다
-    user (Foreignkey): user_id(사용자)의 값을 가집니다
-    content (varChar): 후기내용, 100자 제한
-    review_image (Image) : 후기사진, 제품별 이미지 1장 (media/review 폴더에 월별로 저장)
-    created_at (datetime) : 생성일
-    updated_at (datetime) : 수정일
-    grade (positiveInt) : 평점, 1~5점을 부여합니다
-    """
-
     store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.CharField("후기내용", max_length=50)

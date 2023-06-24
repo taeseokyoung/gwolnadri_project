@@ -37,7 +37,9 @@ urlpatterns = [
         name="booking_ticket_view",
     ),
     path(
-        "<int:id>/bookedtickets/", views.BookingTicketDetailView.as_view(), name="booking_ticket_detail_view",
+        "<int:id>/bookedtickets/",
+        views.BookingTicketDetailView.as_view(),
+        name="booking_ticket_detail_view",
     ),
     path(
         "bookedlist/",
@@ -48,5 +50,10 @@ urlpatterns = [
         "<int:event_id>/bookmark/",
         views.EventBookmarkView.as_view(),
         name="bookmark_event_view",
+    ),
+    path(
+        "list/",
+        views.EventListView.as_view(),
+        name="event_list_view",
     ),
 ]

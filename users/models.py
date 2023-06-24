@@ -35,9 +35,8 @@ class User(AbstractBaseUser):
 
     username = models.CharField(max_length=20, unique=True, null=True, blank=False)
     password = models.CharField(max_length=255)
-    profile_image = models.URLField(null=True, blank=True)
-    # profile_image = models.ImageField(upload_to="%Y/%m", blank=True)
-    #URL으로 할건지, 파일로 받을건지 정해서 하나 사용하기.
+    profile_image = models.ImageField(upload_to="profile_image", null=True, blank=True)
+
 
     objects = UserManager()
 
