@@ -56,8 +56,6 @@ class EventSerializer(serializers.ModelSerializer):
     def get_review_count(self, obj):
         return obj.review_set.count()
 
-    likes_count = serializers.SerializerMethodField()
-
     def get_likes_count(self, obj):
         return obj.likes.count()
 
