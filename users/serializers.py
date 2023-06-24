@@ -58,7 +58,7 @@ class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
 # 마이 프로필 - 프로필 이미지, 내가 작성한 리뷰 목록, 좋아요목록, 북마크 목록
 class UserProfileSerializer(serializers.ModelSerializer):
     bookmark_stores = StoreListSerializer(many=True)
-    bookmark_events = EventBookmarkSerializer(many=True)
+    bookmark_events = EventSerializer(many=True)
     profile_image = serializers.ImageField(
         max_length=None,
         use_url=True,
