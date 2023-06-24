@@ -93,6 +93,7 @@ class EventListSerializer(EventSerializer):
             "event_start_date",
             "event_end_date",
             "review_count",
+            "likes_count"
             "event_bookmarks",
         )
 
@@ -262,20 +263,4 @@ class BookedTicketCountSerializer(serializers.ModelSerializer):
             "quantity",
             "current_booking",
             "max_booking_count",
-        )
-
-
-class EventBookmarkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Event
-        fields = (
-            "title",
-            "content",
-            "image",
-            "created_at",
-            "updated_at",
-            "event_start_date",
-            "event_end_date",
-            "likes",
-            "likes_count",
         )
