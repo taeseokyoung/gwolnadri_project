@@ -123,6 +123,8 @@ class TicketView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, CustomPermission]
     serializer_class = TicketCreateSerializer
 
+    # 이벤트_id를 사용하여 해당 이벤트에 생성된 티켓을 조회합니다.
+
     def get(self, request, event_id):
         tickets = Ticket.objects.filter(event=event_id)
         serializer = TicketSerializer(tickets, many=True)
@@ -172,8 +174,13 @@ class TicketDetailView(APIView):
 
 
 class TicketDateDetailView(APIView):
+    """
+    공연id, 공연날짜를 이용하여, 해당 값에 맞는 티켓의 정보를 조회합니다.
+    로그인한 회원만 사용가능합니다.
+    event_date의 타입이 date 타입이기 때문에 url에서 사용하기 위해서 event_date의 타입은 str형으로 사용되어야 합니다.
+    """
     permission_classes = [permissions.IsAuthenticated]
-
+    
     def get(self, request, event_id, event_date):
         ticket = Ticket.objects.filter(event=event_id, event_date=str(event_date))
         serializer = TicketSerializer(ticket, many=True)
@@ -181,6 +188,12 @@ class TicketDateDetailView(APIView):
 
 
 class TicketTimeDetailView(APIView):
+    """
+    공연id, 공연날짜, 공연 시간을 이용하여, 해당 값에 맞는 티켓의 정보를 조회합니다.
+    로그인한 회원만 사용가능합니다.
+    event_date의 타입이 date 타입이기 때문에 url에서 사용하기 위해서 event_date의 타입은 str형으로 사용되어야 합니다.
+    event_time의 타입이 varchar 타입이기 때문에 url에서 사용하기 위해서 event_time의 타입은 str형으로 사용되어야 합니다.
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, event_id, event_date, event_time):
@@ -192,6 +205,15 @@ class TicketTimeDetailView(APIView):
 
 
 class LikeView(APIView):
+    """
+    게시글 좋아요 기능을 수행합니다.
+    로그인하여 검증된 회원만 사용이 가능합니다.
+    POST
+    post 요청 시 해당 event_id를 가진 공연정보의 likes 필드에 요청한 회원을 생성합니다.
+    요청 성공 시 상태메시지 200을 출력합니다
+    해당 likes 필드에 요청한 회원이 없을 경우 "like했습니다."메시지를 출력합니다
+    해당 likes 필드에 요청한 회원이 있을 경우 "unlike했습니다.: 메시지를 출력합니다
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, event_id):
@@ -205,6 +227,11 @@ class LikeView(APIView):
 
 
 class BookingTicketDetailView(APIView):
+    """
+    예매한 티켓을 조회하기 위해 사용됩니다.
+    id는 예약항목의 id를 나타냅니다.
+    조회하는 회원의 예약항목의 id를 사용하여, 해당 id를 가진 티켓의 정보를 조회합니다.
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, id):
@@ -228,6 +255,20 @@ class BookingTicketView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, ticket_id):
+        """
+        예매를 진행하기 위해 사용됩니다.
+        ticket_id를 받아 해당 티켓이 존재하는지 먼저 확인합니다
+        해당, 티켓이 존재하지 않는다면, "티켓이 존재하지 않습니다." 메시지와 404 상태메시지를 출력합니다
+
+        시리얼라이저를 통해 입력값이 정확한 형태로 들어왔는지 확인합니다
+        quantity의 값을 0 이하로 입력할 시 "올바른 수량(quantity)을 입력해주세요." 메시지와 400 상태메시지를 출력합니다
+        current_booking(현재 예매된 티켓의 수량)의 값이 quantity(예매하고자 하는 수량)을 더하여 max_booking_count(최대 수량)을 넘을 경우
+        "예매가 불가능합니다." 메시지와 400 상태메시지를 출력합니다
+
+        예매가 가능한 상황이라면, current_booking에 quantity 값을 더해주고, 더해준 값을 해당 티켓에 저장해주고, 예매 내역을 ticket_booking에 저장해주고
+        "예매가 완료되었습니다." 메시지와 201 상태메시지를 출력합니다.
+        """
+        
         try:
             ticket = Ticket.objects.get(id=ticket_id)
         except Ticket.DoesNotExist:
@@ -279,7 +320,7 @@ class EventBookmarkView(APIView):
         event = get_object_or_404(Event, id=event_id)
         if request.user in event.event_bookmarks.all():
             event.event_bookmarks.remove(request.user)
-            return Response("북마크가 취소되었습니다.", status=status.HTTP_200_OK)
+            return Response({"message": "북마크가 취소되었습니다."}, status=status.HTTP_200_OK)
         else:
             event.event_bookmarks.add(request.user)
-            return Response("북마크 완료했습니다.", status=status.HTTP_200_OK)
+            return Response({"message": "북마크 완료했습니다."}, status=status.HTTP_200_OK)

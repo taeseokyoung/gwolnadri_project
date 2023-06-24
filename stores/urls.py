@@ -22,6 +22,16 @@ urlpatterns = [
         name="purchase_record",
     ),
     path(
+        "payment/<int:user_id>/hanbok/",
+        views.HanbokPurchaseRecordView.as_view(),
+        name="hanbok_purchase_record",
+    ),
+    path(
+        "payment/<int:user_id>/event/",
+        views.EventPurchaseRecordView.as_view(),
+        name="event_purchase_record",
+    ),
+    path(
         "payment/<tid>/",
         views.PutPurchaseRecordView.as_view(),
         name="put_purchase_record",
