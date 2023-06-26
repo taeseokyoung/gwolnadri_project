@@ -6,13 +6,14 @@ from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# env 설정 : SECRET_KEY, DB
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG", "0") == "1"
-ALLOWED_HOSTS = ["backend"]
+ALLOWED_HOSTS = [
+    "backend",
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -70,7 +71,6 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = "config.wsgi.application"
 
 POSTGRES_DB = os.environ.get("POSTGRES_DB", "")
@@ -113,7 +113,8 @@ LANGUAGE_CODE = "ko-kr"
 TIME_ZONE = "Asia/Seoul"
 USE_I18N = True
 USE_TZ = True
-STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = "/static/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -125,10 +126,11 @@ REST_FRAMEWORK = {
     )
 }
 
+
 REST_USE_JWT = True
 SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.MyTokenObtainPairSerializer",
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=3600),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
@@ -161,7 +163,16 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
-CORS_ORIGIN_WHITELIST = ["http://3.34.183.59"]
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://www.gwolnadri.online",
+]
+
+CORS_ORIGIN_WHITELIST = [
+    "https://gwolnadri.netlify.app",
+]
 CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 SITE_ID = 1
 ACCOUNT_AUTHENTICATION_METHOD = "email"

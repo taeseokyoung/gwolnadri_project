@@ -6,6 +6,7 @@ import environ
 from django.db.models import Avg
 
 
+# ✅ 위치정보 api
 def get_location(address):
     url = "https://dapi.kakao.com/v2/local/search/address.json?query=" + address
     headers = {"Authorization": os.environ.get("KakaoAK")}
@@ -17,6 +18,7 @@ def get_location(address):
     return result
 
 
+# ✅ 한복집 리스트 (id, 판매자, 가게이름, 가게주소, x좌표, y좌표, 전체 좋아요 수, 평균 별점, 북마크)
 class StoreListSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     total_likes = serializers.SerializerMethodField()
@@ -49,6 +51,7 @@ class StoreListSerializer(serializers.ModelSerializer):
         )
 
 
+# ✅ 한복집 추가 (가게이름, 가게주소)
 class CreateStoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Store
@@ -57,6 +60,7 @@ class CreateStoreSerializer(serializers.ModelSerializer):
             "store_address",
         )
 
+    # ✅ 한복집 x,y좌표 | 별점(후기없는경우 0) 추가
     def create(self, validated_data):
         location_result = get_location(validated_data["store_address"])
         print(validated_data)
@@ -71,6 +75,7 @@ class CreateStoreSerializer(serializers.ModelSerializer):
         return store
 
 
+# ✅ 한복상품정보 (제품명, 제품설명, 가격, 이미지)
 class HanbokSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
 
@@ -83,6 +88,7 @@ class HanbokSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+# ✅ 한복상품등록 (제품명, 제품설명, 가격, 이미지)
 class CreateHanbokSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hanbok
@@ -94,6 +100,7 @@ class CreateHanbokSerializer(serializers.ModelSerializer):
         ]
 
 
+# ✅ 한복점 리뷰 열람 (후기내용, 후기사진, 평점, 생성일, 수정일)
 class CommentSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
 
@@ -115,6 +122,7 @@ class CommentSerializer(serializers.ModelSerializer):
         ]
 
 
+# ✅ 한복점 리뷰 등록 (후기내용, 후기사진, 평점, 생성일, 수정일)
 class CreateCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = HanbokComment
@@ -125,6 +133,7 @@ class CreateCommentSerializer(serializers.ModelSerializer):
         ]
 
 
+# ✅ 결제 정보 기록용 Serializer
 class PurchaseRecordCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseRecord
@@ -146,6 +155,7 @@ class PurchaseRecordCreateSerializer(serializers.ModelSerializer):
         ]
 
 
+# ✅ 결제 정보 조회용 Serializer
 class PurchaseRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseRecord

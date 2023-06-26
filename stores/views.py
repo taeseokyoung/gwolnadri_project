@@ -17,7 +17,12 @@ from .serializers import (
 )
 
 
+# 한복집 리스트
 class StoreListView(APIView):
+    """
+    모든 한복집 리스트 -> 궁별 한복집 리스트로 변경할 예정
+    """
+
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request):
@@ -51,7 +56,12 @@ class StoreListView(APIView):
             )
 
 
+# 한복집 상세 페이지
 class StoreDetailView(APIView):
+    """
+    해당 한복집의 정보와 등록한 한복 상품 정보, 리뷰 노출
+    """
+
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request, store_id):
@@ -73,6 +83,9 @@ class StoreDetailView(APIView):
         )
 
     def post(self, request, store_id):
+        """
+        staff인지 && 내가게인지 확인
+        """
         my_store = list(Store.objects.filter(owner=request.user))
         this_store = list(Store.objects.filter(id=store_id))
 
@@ -101,6 +114,9 @@ class CommentView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request, store_id):
+        """
+        한복점에 달린 모든 리뷰만 열람
+        """
         store = get_object_or_404(Store, id=store_id)
         comments = store.comments.all()
         comment_serializer = CommentSerializer(comments, many=True)
@@ -112,6 +128,9 @@ class CommentView(APIView):
         )
 
     def post(self, request, store_id):
+        """
+        한복점 리뷰 작성 로그인한 사람이면 모두 가능
+        """
         comment_serializer = CreateCommentSerializer(data=request.data)
         if comment_serializer.is_valid():
             comment_serializer.save(store_id=store_id, user=request.user)
@@ -130,8 +149,10 @@ class CommentDetailView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def put(self, request, store_id, comment_id):
+        """
+        한복점 리뷰 수정
+        """
         comment = get_object_or_404(HanbokComment, id=comment_id, store_id=store_id)
-        print("여기여기여기 : ", comment)
         if request.user == comment.user:
             serializer = CreateCommentSerializer(comment, data=request.data)
             if serializer.is_valid():
@@ -152,6 +173,9 @@ class CommentDetailView(APIView):
             )
 
     def delete(self, request, store_id, comment_id):
+        """
+        한복점 리뷰 삭제
+        """
         comment = get_object_or_404(HanbokComment, id=comment_id, store_id=store_id)
         if request.user == comment.user:
             comment.delete()
@@ -183,6 +207,7 @@ class LikeView(APIView):
             )
 
 
+# 한복 상세페이지
 class HanbokDetailView(APIView):
     def get(self, request, hanbok_id):
         hanbok = get_object_or_404(Hanbok, id=hanbok_id)
@@ -190,6 +215,7 @@ class HanbokDetailView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# 전체예약 조회 & 결제 승인요청
 class PurchaseRecordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -219,21 +245,7 @@ class PurchaseRecordView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class EventPurchaseRecordView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request, user_id):
-        user = get_object_or_404(User, id=user_id)
-        if request.user == user:
-            complete = PurchaseRecord.objects.filter(
-                user_id=user_id, approved_at__isnull=False, type="event"
-            ).order_by("rsrvt_date")
-            serializer = PurchaseRecordSerializer(complete, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"message": "권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
-
-
+# 결제내역 상세조회 & 결제 완료
 class PutPurchaseRecordView(APIView):
     def get(self, request, tid):
         purchase_record = get_object_or_404(PurchaseRecord, tid=tid)
@@ -252,6 +264,7 @@ class PutPurchaseRecordView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# 예약내역 상세조회 & 한복 예약결제 취소 (DB 기록삭제)
 class GetPurchaseRecordView(APIView):
     def get(self, request, user_id, tid):
         user = get_object_or_404(User, id=user_id)
@@ -270,6 +283,7 @@ class GetPurchaseRecordView(APIView):
             return Response({"message": "권한이 없습니다"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+# 한복점 북마크
 class StoreBookmarkView(APIView):
     def post(self, request, store_id):
         store = get_object_or_404(Store, id=store_id)
@@ -281,6 +295,7 @@ class StoreBookmarkView(APIView):
             return Response("북마크 완료했습니다.", status=status.HTTP_200_OK)
 
 
+# 한복 예약 결제 리스트 조회
 class HanbokPurchaseRecordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -296,6 +311,7 @@ class HanbokPurchaseRecordView(APIView):
             return Response({"message": "권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
 
+# 행사 예약 결제 리스트 조회
 class EventPurchaseRecordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

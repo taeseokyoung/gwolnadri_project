@@ -5,12 +5,29 @@ from datetime import datetime
 
 
 class EventScrapSerializer(serializers.ModelSerializer):
+    """
+    크롤링한 공연정보를 보여주는 시리얼라이저입니다.
+    """
+
     class Meta:
         model = EventList
         fields = "__all__"
 
 
 class EventCreateSerializer(serializers.ModelSerializer):
+    """
+    공연정보를 작성하기 위해 사용합니다.
+    title (varchar),
+    content (text),
+    image (image),
+    event_start_date (date),
+    event_end_date (date),
+    time_slots (JSON),
+    max_booking (Positiveint),
+    money (int),
+    값이 필요합니다.
+    """
+
     class Meta:
         model = Event
         fields = (
@@ -48,6 +65,7 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = (
+            "id",
             "author",
             "title",
             "content",
@@ -70,6 +88,7 @@ class EventListSerializer(EventSerializer):
     class Meta:
         model = Event
         fields = (
+            "id",
             "title",
             "image",
             "event_start_date",
@@ -99,10 +118,25 @@ class EventEditSerializer(serializers.ModelSerializer):
 class EventReviewSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
     updated_at = serializers.DateTimeField(format="%m월%d일 %H:%M", read_only=True)
+    author_name = serializers.SerializerMethodField()
+
+    def get_author_name(self, obj):
+        # author_name = obj.author.username
+        return obj.author.username
 
     class Meta:
         model = EventReview
-        fields = "__all__"
+        fields = (
+            "id",
+            "author",
+            "author_name",
+            "event",
+            "content",
+            "review_image",
+            "created_at",
+            "updated_at",
+            "grade",
+        )
 
 
 class EventReviewCreateSerializer(serializers.ModelSerializer):
@@ -111,6 +145,7 @@ class EventReviewCreateSerializer(serializers.ModelSerializer):
         fields = (
             "content",
             "grade",
+            "review_image",
         )
 
 
@@ -162,6 +197,10 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class BookedTicketSerializer(serializers.ModelSerializer):
+    """
+    예약한 티켓을 조회하기 위해 사용됩니다.
+    """
+
     event = serializers.SerializerMethodField()
     event_date = serializers.SerializerMethodField()
     event_time = serializers.SerializerMethodField()
@@ -188,6 +227,11 @@ class BookedTicketSerializer(serializers.ModelSerializer):
 
 
 class BookedTicketCountSerializer(serializers.ModelSerializer):
+    """
+    티켓 예약을 위해 만들어진 시리얼라이저 입니다
+    current_booking과 max_booking_count을 이용하여, 티켓의 예약 가능여부를 판단합니다
+    """
+
     author = serializers.SerializerMethodField()
     event = serializers.SerializerMethodField()
     current_booking = serializers.IntegerField(read_only=True)
@@ -222,20 +266,4 @@ class BookedTicketCountSerializer(serializers.ModelSerializer):
             "quantity",
             "current_booking",
             "max_booking_count",
-        )
-
-
-class EventBookmarkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Event
-        fields = (
-            "title",
-            "content",
-            "image",
-            "created_at",
-            "updated_at",
-            "event_start_date",
-            "event_end_date",
-            "likes",
-            "likes_count",
         )
