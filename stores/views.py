@@ -86,12 +86,9 @@ class StoreDetailView(APIView):
         """
         staff인지 && 내가게인지 확인
         """
-        my_store = list(Store.objects.filter(owner=request.user))
-        this_store = list(Store.objects.filter(id=store_id))
+        my_store = list(Store.objects.filter(owner=request.user, id=store_id))
 
-        if (request.user.is_staff == True) and (
-            (this_store == my_store) or (this_store[0] in my_store)
-        ):
+        if (request.user.is_staff == True) and (my_store):
             serializer = CreateHanbokSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save(owner=request.user, store_id=store_id)
