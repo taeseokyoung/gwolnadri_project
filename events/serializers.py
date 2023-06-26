@@ -5,12 +5,14 @@ from datetime import datetime
 
 
 class EventScrapSerializer(serializers.ModelSerializer):
-   """
-   크롤링한 공연정보를 보여주는 시리얼라이저입니다.
-   """
+    """
+    크롤링한 공연정보를 보여주는 시리얼라이저입니다.
+    """
+
     class Meta:
         model = EventList
         fields = "__all__"
+
 
 class EventCreateSerializer(serializers.ModelSerializer):
     """
@@ -25,6 +27,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
     money (int),
     값이 필요합니다.
     """
+
     class Meta:
         model = Event
         fields = (
@@ -197,6 +200,7 @@ class BookedTicketSerializer(serializers.ModelSerializer):
     """
     예약한 티켓을 조회하기 위해 사용됩니다.
     """
+
     event = serializers.SerializerMethodField()
     event_date = serializers.SerializerMethodField()
     event_time = serializers.SerializerMethodField()
@@ -227,6 +231,7 @@ class BookedTicketCountSerializer(serializers.ModelSerializer):
     티켓 예약을 위해 만들어진 시리얼라이저 입니다
     current_booking과 max_booking_count을 이용하여, 티켓의 예약 가능여부를 판단합니다
     """
+
     author = serializers.SerializerMethodField()
     event = serializers.SerializerMethodField()
     current_booking = serializers.IntegerField(read_only=True)
