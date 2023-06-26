@@ -6,7 +6,7 @@ urlpatterns = [
     path("<int:store_id>/", views.StoreDetailView.as_view(), name="store_detail_view"),
     path("<int:store_id>/comments/", views.CommentView.as_view(), name="comment_view"),
     path(
-        "<int:store_id>/comments/<int:comment_id>/",
+        "comments/<int:comment_id>/",
         views.CommentDetailView.as_view(),
         name="comment_detail_view",
     ),

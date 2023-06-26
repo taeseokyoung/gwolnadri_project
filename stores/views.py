@@ -148,16 +148,15 @@ class CommentView(APIView):
 class CommentDetailView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def put(self, request, store_id, comment_id):
+    def put(self, request, comment_id):
         """
         한복점 리뷰 수정
         """
-        comment = get_object_or_404(HanbokComment, id=comment_id, store_id=store_id)
-        print("여기여기여기 : ", comment)
+        comment = get_object_or_404(HanbokComment, id=comment_id)
         if request.user == comment.user:
             serializer = CreateCommentSerializer(comment, data=request.data)
             if serializer.is_valid():
-                serializer.save(store_id=store_id, id=comment_id)
+                serializer.save(id=comment_id)
                 return Response(
                     {"message": "후기 수정 완료", "data": serializer.data},
                     status=status.HTTP_200_OK,
@@ -173,11 +172,11 @@ class CommentDetailView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-    def delete(self, request, store_id, comment_id):
+    def delete(self, request, comment_id):
         """
         한복점 리뷰 삭제
         """
-        comment = get_object_or_404(HanbokComment, id=comment_id, store_id=store_id)
+        comment = get_object_or_404(HanbokComment, id=comment_id)
         if request.user == comment.user:
             comment.delete()
             return Response(
