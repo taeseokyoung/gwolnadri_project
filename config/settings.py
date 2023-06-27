@@ -1,20 +1,28 @@
 from pathlib import Path
 import os
 import environ
+
+# rest_framework and simple jwt
 from datetime import timedelta
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+# env 설정 : SECRET_KEY, DB
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
-DEBUG = os.environ.get("DEBUG", "0") == "1"
-ALLOWED_HOSTS = [
-    "backend",
-]
 
+# env 설정 : SECRET_KEY
+SECRET_KEY = os.environ.get("SECRET_KEY")
+
+
+# DEBUG = False 는 소셜로그인
+DEBUG = True
+
+
+# Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -71,29 +79,25 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = "config.wsgi.application"
 
-POSTGRES_DB = os.environ.get("POSTGRES_DB", "")
-if POSTGRES_DB:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": POSTGRES_DB,
-            "USER": os.environ.get("POSTGRES_USER", ""),
-            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
-            "HOST": os.environ.get("POSTGRES_HOST", ""),
-            "PORT": os.environ.get("POSTGRES_PORT", ""),
-        }
-    }
 
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
+# Database = postgresql 12 / env
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        # 'HOST': '127.0.0.1',
+        "PORT": os.environ.get("DB_PORT"),
     }
+}
 
+
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -109,16 +113,33 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+# Internationalization
 LANGUAGE_CODE = "ko-kr"
+
 TIME_ZONE = "Asia/Seoul"
+
 USE_I18N = True
+
 USE_TZ = True
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATIC_URL = "/static/"
+
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = "static/"
+
+
+# media
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
+
+
+# Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# auth user
 AUTH_USER_MODEL = "users.User"
+
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -126,11 +147,14 @@ REST_FRAMEWORK = {
     )
 }
 
-
 REST_USE_JWT = True
+
+
 SIMPLE_JWT = {
+    # Pay Load 재정의
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.MyTokenObtainPairSerializer",
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    # access_token 유효시간 배포 시 수정
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=3000),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
@@ -164,17 +188,11 @@ SIMPLE_JWT = {
 }
 
 
-CORS_ORIGIN_ALLOW_ALL = True
+# cors
+CORS_ALLOW_ALL_ORIGINS = True
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://www.gwolnadri.online",
-]
-
-CORS_ORIGIN_WHITELIST = [
-    "https://gwolnadri.netlify.app",
-]
-CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 SITE_ID = 1
+
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
