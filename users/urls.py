@@ -24,7 +24,7 @@ urlpatterns = [
     # path("naver/login/callback/", views.naver_callback, name="naver_callback"),
     # path("naver/login/finish/", views.NaverLogin.as_view(), name="naver_login_drf"),
 
-    # path("google/login/", views.google_login, name="google_login"),
-    # path("google/login/callback/", views.google_callback, name="google_callback"),
-    # path("google/login/finish/", views.GoogleLogin.as_view(), name="google_login_drf"),
+    path("google/login/", views.google_login, name="google_login"),
+    path("google/login/callback/", views.google_callback, name="google_callback"),
+    path("google/login/finish/", views.GoogleLogin.as_view(), name="google_login_drf"),
 ]

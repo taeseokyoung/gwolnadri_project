@@ -20,6 +20,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # DEBUG = False 는 소셜로그인
 DEBUG = True
+# ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
