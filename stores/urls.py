@@ -17,29 +17,14 @@ urlpatterns = [
         name="hanbok_detail",
     ),
     path(
-        "payment/<int:user_id>/",
+        "payment/",
         views.PurchaseRecordView.as_view(),
         name="purchase_record",
-    ),
-    path(
-        "payment/<int:user_id>/hanbok/",
-        views.HanbokPurchaseRecordView.as_view(),
-        name="hanbok_purchase_record",
-    ),
-    path(
-        "payment/<int:user_id>/event/",
-        views.EventPurchaseRecordView.as_view(),
-        name="event_purchase_record",
     ),
     path(
         "payment/<tid>/",
         views.PutPurchaseRecordView.as_view(),
         name="put_purchase_record",
-    ),
-    path(
-        "payment/<int:user_id>/<tid>/",
-        views.GetPurchaseRecordView.as_view(),
-        name="get_purchase_record",
     ),
     path(
         "<int:store_id>/bookmark/",
