@@ -216,33 +216,37 @@ class HanbokDetailView(APIView):
 class PurchaseRecordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, user_id):
-        user = get_object_or_404(User, id=user_id)
-        if request.user == user:
-            complete = PurchaseRecord.objects.filter(
-                user_id=user_id, approved_at__isnull=False
-            ).order_by("rsrvt_date")
-            serializer = PurchaseRecordSerializer(complete, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"message": "권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+    def get(self, request):
+        user = self.request.user.id
+        complete = PurchaseRecord.objects.filter(
+            user_id=user, approved_at__isnull=False
+        ).order_by("rsrvt_date")
+        print(user)
+        serializer = PurchaseRecordSerializer(complete, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, user_id):
-        decomplete = PurchaseRecord.objects.filter(
-            user_id=user_id, approved_at__isnull=True
-        )
-        if decomplete.exists():
-            decomplete.delete()
-        serializer = PurchaseRecordCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response({"message": "db 저장완료"}, status=status.HTTP_200_OK)
-        else:
-            print(serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        try:
+            user = self.request.user.id
+            decomplete = PurchaseRecord.objects.filter(
+                user_id=user, approved_at__isnull=True
+            )
+            if decomplete.exists():
+                decomplete.delete()
+            serializer = PurchaseRecordCreateSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(user=request.user)
+                return Response({"message": "db 저장완료"}, status=status.HTTP_200_OK)
+            else:
+                print(serializer.errors)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except PurchaseRecord.DoesNotExist:
+            return Response(
+                {"message": "유효한 정보를 입력해 주세요"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
-# 결제내역 상세조회 & 결제 완료
+# 결제내역 상세조회 & 결제 완료 & 한복 결제취소
 class PutPurchaseRecordView(APIView):
     def get(self, request, tid):
         purchase_record = get_object_or_404(PurchaseRecord, tid=tid)
@@ -250,34 +254,29 @@ class PutPurchaseRecordView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, tid):
-        purchase_record = get_object_or_404(PurchaseRecord, tid=tid)
-        serializer = PurchaseRecordCreateSerializer(
-            purchase_record, data=request.data, partial=True
-        )
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "결제완료"}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            purchase_record = get_object_or_404(PurchaseRecord, tid=tid)
+            serializer = PurchaseRecordCreateSerializer(
+                purchase_record, data=request.data, partial=True
+            )
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "결제완료"}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except PurchaseRecord.DoesNotExist:
+            return Response(
+                {"message": "유효한 정보를 입력해 주세요"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-
-# 예약내역 상세조회 & 한복 예약결제 취소 (DB 기록삭제)
-class GetPurchaseRecordView(APIView):
-    def get(self, request, user_id, tid):
-        user = get_object_or_404(User, id=user_id)
-        purchase_record = get_object_or_404(PurchaseRecord, tid=tid)
-        if request.user == user:
-            serializer = PurchaseRecordSerializer(purchase_record)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def delete(self, request, user_id, tid):
-        user = get_object_or_404(User, id=user_id)
-        purchase_record = get_object_or_404(PurchaseRecord, tid=tid)
-        if request.user == user:
+    def delete(self, request, tid):
+        try:
+            user = self.request.user.id
+            purchase_record = PurchaseRecord.objects.filter(tid=tid, user_id=user)
             purchase_record.delete()
             return Response({"message": "구매가 취소되었습니다."}, status=status.HTTP_200_OK)
-        else:
-            return Response({"message": "권한이 없습니다"}, status=status.HTTP_400_BAD_REQUEST)
+        except purchase_record.DoesNotExist:
+            return Response({"message": "잘못된 정보입니다."}, status=status.HTTP_404_NOT_FOUND)
 
 
 # 한복점 북마크

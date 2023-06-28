@@ -21,16 +21,15 @@ from events.serializers import (
 )
 
 
-class EventListView(generics.ListCreateAPIView):
-    serializer_class = EventScrapSerializer
-    queryset = EventList.objects.all()
+class EventListView(APIView):
+    def get(self, request):
+        eventlist = EventList.objects.all()
+        serializer = EventScrapSerializer(eventlist, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class EventView(APIView):
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        CustomPermission,
-    ]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, CustomPermission]
     serializer_class = EventListSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = [
