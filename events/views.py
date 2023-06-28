@@ -21,22 +21,25 @@ from events.serializers import (
 )
 
 
-class EventListView(generics.ListCreateAPIView):
-    serializer_class = EventScrapSerializer
-    queryset = EventList.objects.all()
+class EventListView(APIView):
+    def get(self, request):
+        eventlist = EventList.objects.all()
+        serializer = EventScrapSerializer(eventlist, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class EventView(generics.ListCreateAPIView):
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        CustomPermission,
-    ]
+class EventView(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, CustomPermission]
     serializer_class = EventListSerializer
-    queryset = Event.objects.all()
     filter_backends = [filters.SearchFilter]
     search_fields = [
         "title",
     ]
+
+    def get(self, request):
+        event = Event.objects.all().order_by("-created_at")
+        serializer = EventListSerializer(event, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         serializer = EventCreateSerializer(data=request.data)
@@ -73,19 +76,17 @@ class EventDetailView(APIView):
         return Response({"message": "삭제완료"}, status=status.HTTP_200_OK)
 
 
-class EventReviewView(generics.ListCreateAPIView):
+class EventReviewView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = EventReviewSerializer
-    queryset = None
 
-    def get(self, request, *args, **kwargs):
-        reviews = (
-            get_object_or_404(Event, id=kwargs.get("event_id"))
-            .review_set.all()
-            .order_by("-created_at")
+    def get(self, request, event_id):
+        review = EventReview.objects.all().order_by().order_by("-created_at")
+        serializer = EventReviewSerializer(review, many=True)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
         )
-        self.queryset = reviews
-        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         serializer = EventReviewCreateSerializer(
@@ -179,8 +180,9 @@ class TicketDateDetailView(APIView):
     로그인한 회원만 사용가능합니다.
     event_date의 타입이 date 타입이기 때문에 url에서 사용하기 위해서 event_date의 타입은 str형으로 사용되어야 합니다.
     """
+
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get(self, request, event_id, event_date):
         ticket = Ticket.objects.filter(event=event_id, event_date=str(event_date))
         serializer = TicketSerializer(ticket, many=True)
@@ -194,6 +196,7 @@ class TicketTimeDetailView(APIView):
     event_date의 타입이 date 타입이기 때문에 url에서 사용하기 위해서 event_date의 타입은 str형으로 사용되어야 합니다.
     event_time의 타입이 varchar 타입이기 때문에 url에서 사용하기 위해서 event_time의 타입은 str형으로 사용되어야 합니다.
     """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, event_id, event_date, event_time):
@@ -214,6 +217,7 @@ class LikeView(APIView):
     해당 likes 필드에 요청한 회원이 없을 경우 "like했습니다."메시지를 출력합니다
     해당 likes 필드에 요청한 회원이 있을 경우 "unlike했습니다.: 메시지를 출력합니다
     """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, event_id):
@@ -232,6 +236,7 @@ class BookingTicketDetailView(APIView):
     id는 예약항목의 id를 나타냅니다.
     조회하는 회원의 예약항목의 id를 사용하여, 해당 id를 가진 티켓의 정보를 조회합니다.
     """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, id):
@@ -268,7 +273,7 @@ class BookingTicketView(APIView):
         예매가 가능한 상황이라면, current_booking에 quantity 값을 더해주고, 더해준 값을 해당 티켓에 저장해주고, 예매 내역을 ticket_booking에 저장해주고
         "예매가 완료되었습니다." 메시지와 201 상태메시지를 출력합니다.
         """
-        
+
         try:
             ticket = Ticket.objects.get(id=ticket_id)
         except Ticket.DoesNotExist:
