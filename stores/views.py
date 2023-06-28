@@ -86,12 +86,9 @@ class StoreDetailView(APIView):
         """
         staff인지 && 내가게인지 확인
         """
-        my_store = list(Store.objects.filter(owner=request.user))
-        this_store = list(Store.objects.filter(id=store_id))
+        my_store = list(Store.objects.filter(owner=request.user, id=store_id))
 
-        if (request.user.is_staff == True) and (
-            (this_store == my_store) or (this_store[0] in my_store)
-        ):
+        if (request.user.is_staff == True) and (my_store):
             serializer = CreateHanbokSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save(owner=request.user, store_id=store_id)
@@ -148,15 +145,15 @@ class CommentView(APIView):
 class CommentDetailView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def put(self, request, store_id, comment_id):
+    def put(self, request, comment_id):
         """
         한복점 리뷰 수정
         """
-        comment = get_object_or_404(HanbokComment, id=comment_id, store_id=store_id)
+        comment = get_object_or_404(HanbokComment, id=comment_id)
         if request.user == comment.user:
             serializer = CreateCommentSerializer(comment, data=request.data)
             if serializer.is_valid():
-                serializer.save(store_id=store_id, id=comment_id)
+                serializer.save(id=comment_id)
                 return Response(
                     {"message": "후기 수정 완료", "data": serializer.data},
                     status=status.HTTP_200_OK,
@@ -172,11 +169,11 @@ class CommentDetailView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-    def delete(self, request, store_id, comment_id):
+    def delete(self, request, comment_id):
         """
         한복점 리뷰 삭제
         """
-        comment = get_object_or_404(HanbokComment, id=comment_id, store_id=store_id)
+        comment = get_object_or_404(HanbokComment, id=comment_id)
         if request.user == comment.user:
             comment.delete()
             return Response(
@@ -314,6 +311,17 @@ class HanbokPurchaseRecordView(APIView):
 # 행사 예약 결제 리스트 조회
 class EventPurchaseRecordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        if request.user == user:
+            complete = PurchaseRecord.objects.filter(
+                user_id=user_id, approved_at__isnull=False, type="event"
+            ).order_by("rsrvt_date")
+            serializer = PurchaseRecordSerializer(complete, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
     def get(self, request, user_id):
         user = get_object_or_404(User, id=user_id)
