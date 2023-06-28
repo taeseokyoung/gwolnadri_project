@@ -239,6 +239,8 @@ class GoogleLogin(SocialLoginView):
 
 ##########################################
 
+################## KAKAO Login ##################
+
 KAKAO_CALLBACK_URI = BASE_URL + "users/kakao/login/callback/"
 KAKAO_REDIRECT_URI = "http://127.0.0.1:5500/assets/doc/kakao.html"
 
