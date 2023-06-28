@@ -321,3 +321,14 @@ class EventPurchaseRecordView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"message": "권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        if request.user == user:
+            complete = PurchaseRecord.objects.filter(
+                user_id=user_id, approved_at__isnull=False, type="event"
+            ).order_by("rsrvt_date")
+            serializer = PurchaseRecordSerializer(complete, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
