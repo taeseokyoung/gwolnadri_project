@@ -17,7 +17,7 @@ urlpatterns = [
         name="hanbok_detail",
     ),
     path(
-        "payment/<int:user_id>/",
+        "payment/",
         views.PurchaseRecordView.as_view(),
         name="purchase_record",
     ),
@@ -25,11 +25,6 @@ urlpatterns = [
         "payment/<tid>/",
         views.PutPurchaseRecordView.as_view(),
         name="put_purchase_record",
-    ),
-    path(
-        "payment/<int:user_id>/<tid>/",
-        views.GetPurchaseRecordView.as_view(),
-        name="get_purchase_record",
     ),
     path(
         "<int:store_id>/bookmark/",
