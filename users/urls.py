@@ -16,8 +16,12 @@ urlpatterns = [
         views.ChangePasswordView.as_view(),
         name="change_password",
     ),
-    path("kakao/login/", views.kakao_login, name="kakao_login"),
-    path("kakao/login/callback/", views.kakao_callback, name="kakao_callback"),
+    # path("kakao/login/", views.kakao_login, name="kakao_login"),
+    # path("kakao/login/callback/", views.kakao_callback, name="kakao_callback"),
+    # path("kakao/login/finish/", views.KakaoLogin.as_view(), name="kakao_login_drf"),
+
+    path("kakao/login/", views.KakaoLoginView.as_view(), name="kakao_login"),
+    path("kakao/login/callback/", views.KakaoCallbackView.as_view(), name="kakao_callback"),
     path("kakao/login/finish/", views.KakaoLogin.as_view(), name="kakao_login_drf"),
 
     path("naver/login/", views.naver_login, name="naver_login"),
