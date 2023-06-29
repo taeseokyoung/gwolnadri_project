@@ -1,4 +1,5 @@
 from django.db import models
+from taggit.managers import TaggableManager
 from users.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 
@@ -17,6 +18,7 @@ class Store(models.Model):
     store_bookmarks = models.ManyToManyField(
         User, related_name="bookmark_stores", blank=True
     )
+    tags = TaggableManager(blank=True)
 
     def __str__(self):
         return self.store_name
