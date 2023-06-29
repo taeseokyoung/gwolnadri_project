@@ -8,7 +8,6 @@ class EventScrapSerializer(serializers.ModelSerializer):
     """
     크롤링한 공연정보를 보여주는 시리얼라이저입니다.
     """
-
     class Meta:
         model = EventList
         fields = "__all__"
