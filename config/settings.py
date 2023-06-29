@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "django_filters",
+    "taggit.apps.TaggitAppConfig",
+    "taggit_templatetags2",
     "events",
     "stores",
     "users",
@@ -198,3 +200,8 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
+
+
+# taggit
+TAGGIT_CASE_INSENSITIVE = True
+TAGGIT_LIMIT = 50
