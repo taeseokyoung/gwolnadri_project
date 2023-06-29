@@ -115,7 +115,7 @@ class ChangePasswordView(generics.UpdateAPIView):
 BASE_URL = os.environ.get("BASE_URL")
 
 
-################## GOOGLE Login ##################
+# GOOGLE Login
 GOOGLE_CALLBACK_URI = BASE_URL + "users/google/login/callback/"
 GOOGLE_REDIRECT_URI = "http://127.0.0.1:5500/assets/doc/" + "google.html"
 
@@ -237,10 +237,7 @@ class GoogleLogin(SocialLoginView):
     client_class = OAuth2Client
     # serializer_class = UserTokenObtainPairSerializer
 
-##########################################
-
-################## KAKAO Login ##################
-
+# KAKAO Login
 KAKAO_CALLBACK_URI = BASE_URL + "users/kakao/login/callback/"
 KAKAO_REDIRECT_URI = "http://127.0.0.1:5500/assets/doc/kakao.html"
 
@@ -322,117 +319,8 @@ class KakaoLogin(SocialLoginView):
     client_class = OAuth2Client
     callback_url = KAKAO_CALLBACK_URI
 
-
-######################################
-
-
-################## KAKAO Login ##################
-# KAKAO_CALLBACK_URI = BASE_URL + "users/kakao/login/callback/"
-# KAKAO_REDIRECT_URI = "http://127.0.0.1:5500/assets/doc/kakao.html"
-
-
-# # @api_view(["POST", "GET"])
-# # def kakao_login(request):
-# #     client_id = os.environ.get("KAKAO_CLIENT_ID")
-# #     return redirect(
-# #         f"https://kauth.kakao.com/oauth/authorize?client_id={client_id}&redirect_uri={KAKAO_REDIRECT_URI}&response_type=code&scope=account_email&prompt=login"
-# #     )
-
-# @api_view(["POST", "GET"])
-# def kakao_login(request):
-#     client_id = os.environ.get("KAKAO_CLIENT_ID")
-#     return redirect(
-#         f"https://kauth.kakao.com/oauth/authorize?client_id={client_id}&redirect_uri={KAKAO_REDIRECT_URI}&response_type=code&prompt=login"
-#     )
-
-
-# @api_view(["POST", "GET"])
-# def kakao_callback(request):
-#     client_id = os.environ.get("KAKAO_CLIENT_ID")
-#     code = request.GET.get("code")
-
-#     token_request = requests.get(
-#         f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={KAKAO_REDIRECT_URI}&code={code}"
-#     )
-
-#     token_request_json = token_request.json()
-#     error = token_request_json.get("error", None)
-#     if error is not None:
-#         raise JSONDecodeError(error)
-
-#     access_token = token_request_json.get("access_token")
-
-#     profile_request = requests.get(
-#         "https://kapi.kakao.com/v2/user/me",
-#         headers={"Authorization": f"Bearer {access_token}", "Content-type": "application/x-www-form-urlencoded;charset=utf-8"},
-#     )
-#     profile_request_json = profile_request.json()
-
-#     kakao_account = profile_request_json.get("kakao_account")
-#     email = kakao_account.get("email")
-#     # email = kakao_account.get("kakao_account")["email"]
-
-#     if email is None:
-#         return JsonResponse(
-#             {"err_msg": "카카오 이메일을 가져오지 못했습니다."}, status=status.HTTP_400_BAD_REQUEST
-#         )
-
-#     try:
-#         user = User.objects.get(email=email)
-#         social_user = SocialAccount.objects.get(user=user)
-
-#         if social_user.provider != "kakao":
-#             return JsonResponse(
-#                 {"err_msg": "일치하는 카카오 계정이 없습니다."},
-#                 status=status.HTTP_400_BAD_REQUEST,
-#             )
-
-#         data = {"access_token": access_token, "code": code}
-#         accept = requests.post(f"{BASE_URL}users/kakao/login/finish/", data=data)
-#         accept_status = accept.status_code
-
-#         if accept_status != 200:
-#             return JsonResponse({"err_msg": "카카오 로그인에 실패했습니다."}, status=accept_status)
-
-#         user, created = User.objects.get_or_create(email=email)
-#         refresh_token = UserTokenObtainPairSerializer.get_token(user)
-#         access_token = refresh_token.access_token
-
-#         return Response(
-#             {"refresh": str(refresh_token), "access": str(access_token)},
-#             status=status.HTTP_200_OK,
-#         )
-
-#     except User.DoesNotExist:
-#         data = {"access_token": access_token, "code": code}
-#         accept = requests.post(f"{BASE_URL}users/kakao/login/finish/", data=data)
-#         accept_status = accept.status_code
-
-#         if accept_status != 200:
-#             return JsonResponse({"err_msg": "카카오로 회원가입에 실패했습니다."}, status=accept_status)
-
-#         user, created = User.objects.get_or_create(email=email)
-#         refresh_token = UserTokenObtainPairSerializer.get_token(user)
-#         access_token = refresh_token.access_token
-
-#         return Response(
-#             {"refresh": str(refresh_token), "access": str(access_token)},
-#             status=status.HTTP_201_CREATED,
-#         )
-
-#     except SocialAccount.DoesNotExist:
-#         return JsonResponse(
-#             {"err_msg": "카카오 이메일이 있지만 소셜 사용자는 아닙니다."},
-#             status=status.HTTP_400_BAD_REQUEST,
-#         )
-
-
-# class KakaoLogin(SocialLoginView):
-#     adapter_class = kakao_view.KakaoOAuth2Adapter
-#     callback_url = KAKAO_CALLBACK_URI
-#     client_class = OAuth2Client
-
-################## NAVER Login ##################
+    
+# NAVER Login
 NAVER_CALLBACK_URI = BASE_URL + "users/naver/login/callback/"
 NAVER_REDIRECT_URI = "http://127.0.0.1:5500/assets/doc/naver.html"
 
