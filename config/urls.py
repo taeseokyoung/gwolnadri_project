@@ -12,3 +12,5 @@ urlpatterns = [
     path("events/", include("events.urls")),
     path("api/v1/stores/", include("stores.urls")),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
