@@ -1,5 +1,9 @@
 import os
 import requests
+import random, string
+from django.http import HttpResponse
+from django.http import JsonResponse
+from json.decoder import JSONDecodeError
 from rest_framework import status, permissions, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
@@ -10,14 +14,13 @@ from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from django.shortcuts import redirect, get_object_or_404
 
-from django.http import JsonResponse
-from json.decoder import JSONDecodeError
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.google import views as google_view
 from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.naver import views as naver_view
 from allauth.socialaccount.models import SocialAccount
+
 from .models import User
 from .serializers import (
     UserTokenObtainPairSerializer,
@@ -127,12 +130,11 @@ class ChangePasswordView(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
 
 
-
 # 소셜로그인
 BASE_URL = os.environ.get("BASE_URL")
 FRONT_URL = os.environ.get("FRONT_URL")
 
-################## GOOGLE Login ##################
+# GOOGLE Login
 
 GOOGLE_CALLBACK_URI = BASE_URL + "users/google/login/callback/"
 GOOGLE_REDIRECT_URI = FRONT_URL + "google.html"
@@ -225,7 +227,7 @@ class GoogleLogin(SocialLoginView):
     callback_url = GOOGLE_CALLBACK_URI
     client_class = OAuth2Client
 
-################## KAKAO Login ##################
+# KAKAO Login
 KAKAO_CALLBACK_URI = BASE_URL + "users/kakao/login/callback/"
 KAKAO_REDIRECT_URI = FRONT_URL + "kakao.html"
 
@@ -290,7 +292,7 @@ class KakaoCallbackView(APIView):
                 status=status.HTTP_200_OK,
             )
 
-################## NAVER Login ##################
+# NAVER Login
 NAVER_CALLBACK_URI = BASE_URL + "/users/naver/login/callback/"
 NAVER_REDIRECT_URI = FRONT_URL + "naver.html"
 

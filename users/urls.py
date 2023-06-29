@@ -22,3 +22,4 @@ urlpatterns = [
     path("google/login/callback/", views.google_callback, name="google_callback"),
     path("google/login/finish/", views.GoogleLogin.as_view(), name="google_login_drf"),
 ]
+
