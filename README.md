@@ -15,14 +15,6 @@
 
 <br>
 
-## 궐나드리 프로젝트 개요
-1. 궁에서 진행되는 각종 행사의 정보를 제공, 실시간 잔여 좌석 조회를 지원하는 행사 예매 시스템
-2. 한복점의 위치 조회 및 한복 예약, 평점 작성 시스템으로 사용자가 만들어 가는 가게 환경
-3. 행사 북마크, 한복점 북마크 기능으로 마이페이지에서 관심 행사, 관심 한복점 재조회 가능
-4. 예매 & 예약 내역 조회, 결제 상세내역 조회 시스템
-
-<br>
-
 ## 팀 ‘길벗’
 
 - 태서경 [_taeseokyoung](https://github.com/taeseokyoung) : Backend engineer, Project suppoter
@@ -33,12 +25,27 @@
 
 <br>
 
-## 프로젝트 스택
-
-<img src="https://img.shields.io/badge/django-092E20?style=for-the-badge&logo=django&logoColor=white"><span style="font-size:15px;">4.2.2<span>
-<img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"> 
+## 프로젝트 개요
+1. 궁에서 진행되는 각종 행사의 정보를 제공, 실시간 잔여 좌석 조회를 지원하는 행사 예매 시스템
+2. 한복점의 위치 조회 및 한복 예약, 평점 작성 시스템으로 사용자가 만들어 가는 가게 환경
+3. 행사 북마크, 한복점 북마크 기능으로 마이페이지에서 관심 행사, 관심 한복점 재조회 가능
+4. 예매 & 예약 내역 조회, 결제 상세내역 조회 시스템
 
 <br>
+
+## 프로젝트 스택
+
+<img src="https://img.shields.io/badge/django-092E20?style=for-the-badge&logo=django&logoColor=white"> 4.2.2   
+<img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">    
+<img src="https://img.shields.io/badge/JWT-A100FF?style=for-the-badge&logo=jsonwebtokens&logoColor=white"> 5.2.2   
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white">
+
+<br>
+
+## 프로젝트 라이브러리
+
+> Django REST Framework 3.14.0
+> 
 
 ## Frontend Repositories
 
@@ -47,4 +54,10 @@
 ## Backend Repositories
 
 [궐나드리 : Gwolnadri_Back](https://github.com/taeseokyoung/gwolnadri_project)
+
+<br>
+
+## Team Notion
+
+[궐나드리 : Team Notion](https://www.notion.so/S-A-24702e8266974d38a633b65e73a8fcb5)
 
