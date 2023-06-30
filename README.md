@@ -45,7 +45,8 @@
 ## 프로젝트 라이브러리
 
 > Django REST Framework 3.14.0
-> 
+
+<br>
 
 ## Frontend Repositories
 
@@ -54,8 +55,6 @@
 ## Backend Repositories
 
 [궐나드리 : Gwolnadri_Back](https://github.com/taeseokyoung/gwolnadri_project)
-
-<br>
 
 ## Team Notion
 
