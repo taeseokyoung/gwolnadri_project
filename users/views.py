@@ -251,23 +251,27 @@ class KakaoCallbackView(APIView):
 
 
         profile_json = profile_request.json()
-        kakao_account = profile_json.get("kakao_account")
-        email = kakao_account.get("email")
+        kakao_account = profile_json["kakao_account"]
+        email = kakao_account["email"]
+
 
         if email is None:
             return JsonResponse({'err_msg': '카카오 이메일을 가져오지 못했습니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        profile = kakao_account.get("profile")
-        username = profile.get("nickname")
-        profile_image = profile.get("thumbnail_image_url")   
+        # profile = kakao_account.get("profile")
+        # username = profile.get("nickname")
+        # profile_image = profile.get("thumbnail_image_url")   
+        username = email.split("@")[0]
 
         try:
             user = User.objects.get(email=email)
-            user.username = username
-            user.profile_image = profile_image
+            username = email.split("@")[0]
+            # user.username = username
+            # user.profile_image = profile_image
             user.save()
             refresh = RefreshToken.for_user(user)
             refresh["email"] = user.email
+
             return Response(
                 {
                     "refresh": str(refresh),
@@ -278,9 +282,10 @@ class KakaoCallbackView(APIView):
 
         except User.DoesNotExist:
             password = User.objects.make_random_password()
+            username = email.split("@")[0]
             user = User.objects.create_user(email=email, password=password, username=username)
             user.set_unusable_password()
-            user.profile_image = profile_image
+            # user.profile_image = profile_image
             user.save()
             refresh = RefreshToken.for_user(user)
             refresh["email"] = user.email
