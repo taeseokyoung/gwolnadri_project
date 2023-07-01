@@ -1,23 +1,27 @@
 
-# <img src="https://i.postimg.cc/RVjgzV52/image.png" width="35px" height="35px" style="top:5px;position:relative;"></img> 궐나드리 : Gwolnadri_project
+# <img src="https://i.ibb.co/qkvfZ0F/192x192.jpg" width="35px" height="35px" style="top:5px;position:relative;"></img> 궐나드리 : Gwolnadri
 
 <br>
 
-![Alt text](https://i.postimg.cc/44MNQzZV/2560x1600-5418362-korean-architecture-temple-asian-building-exterior-roof-palace-facade-ornate-blue.jpg)
-
+<a href="https://ibb.co/PWMP2f7"><img src="https://i.ibb.co/s1CNTM0/readme.png" alt="readme" border="0" style="width:100%"></a>
 <br>
 
 ## 궐나드리 기획의도
-> 우리나라 전통 궁에서 진행되는 행사 정보와 예매 정보에 접근성이 부족하다 느껴 서비스를 기획하게 되었습니다.
+> 우리나라 전통 궁궐에서 진행되는 행사 정보와 예매 정보에 접근성이 부족하다 느껴 서비스를 기획하게 되었습니다.
 
-> 행사 이외의 각종 정보, 한복점 예약 등 궐나드리 서비스는 사용자에게 폭 넓은 정보와 편리함을 제공하여   
-> 가족, 친구 또는 연인끼리 특별한 시간을 즐길 수 있도록 돕습니다.
+> 행사 이외의 각종 정보, 한복점 예약 등 궐나드리 서비스는 사용자에게 폭 넓은 정보와 편리함을 제공하여 가족, 친구 또는 연인끼리 특별한 시간을 즐길 수 있도록 돕습니다.
+
+<div align="right" style="text-align:right;">
+  <i>23.07.01</i>
+  <img src="https://i.postimg.cc/RVjgzV52/image.png" right=0 width="45px" height="45px" align="right"></img>
+</div>
+
 
 <br>
 
 ## 팀 ‘길벗’
 
-- 태서경 [_taeseokyoung](https://github.com/taeseokyoung) : Backend engineer, Project suppoter
+- 태서경 [_taeseokyoung](https://github.com/taeseokyoung) : leader | Backend engineer, Project support
 - 이세희 [_BenCyera](https://github.com/BenCyera) : Backend engineer, Payment Part
 - 나지수 [_Ra0ul](https://github.com/Ra0ul) : Backend engineer, Store Part
 - 정찬호 [_Jeongchan-ho](https://github.com/Jeongchan-ho) : Backend engineer, Event Part
@@ -59,5 +63,4 @@
 
 ## Team Notion
 
-[궐나드리 : Team Notion](https://www.notion.so/S-A-24702e8266974d38a633b65e73a8fcb5)
-
+[궐나드리 : Team Notion](https://www.notion.so/1a0780158c574f5fbeea1b4c50bc0a7c?v=76803b80ec9249a9a9b19df2f33eb573)
