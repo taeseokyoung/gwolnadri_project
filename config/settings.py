@@ -74,26 +74,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-POSTGRES_DB = os.environ.get("POSTGRES_DB", "")
-if POSTGRES_DB:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": POSTGRES_DB,
-            "USER": os.environ.get("POSTGRES_USER", ""),
-            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
-            "HOST": os.environ.get("POSTGRES_HOST", ""),
-            "PORT": os.environ.get("POSTGRES_PORT", ""),
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        # ‘HOST’: ‘127.0.0.1’,
+        "PORT": os.environ.get("DB_PORT"),
     }
-
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -164,13 +155,7 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
-
-# CORS_ORIGIN_WHITELIST = [
-#     "https://gwolnadri.netlify.app",
-#     "https://gwolnadri.online",
-# ]
-
-# CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
+CORS_ALLOW_ALL_ORIGINS = True
 
 SITE_ID = 1
 ACCOUNT_AUTHENTICATION_METHOD = "email"
