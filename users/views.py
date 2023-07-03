@@ -168,10 +168,10 @@ class KakaoCallbackView(APIView):
 
         try:
             user = User.objects.get(email=email)
-            user.username = username
-            user.save()
             refresh = RefreshToken.for_user(user)
             refresh["email"] = user.email
+            refresh["username"] = user.username
+            user.save()
             return Response(
                 {
                     "refresh": str(refresh),
@@ -185,11 +185,11 @@ class KakaoCallbackView(APIView):
             user = User.objects.create_user(
                 email=email, password=password, username=username
             )
-            user.username = username
             user.set_unusable_password()
             user.save()
             refresh = RefreshToken.for_user(user)
             refresh["email"] = user.email
+            refresh["username"] = user.username
             return Response(
                 {
                     "refresh": str(refresh),
