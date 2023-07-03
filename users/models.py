@@ -37,7 +37,6 @@ class User(AbstractBaseUser):
     password = models.CharField(max_length=255)
     profile_image = models.ImageField(upload_to="profile_image", null=True, blank=True)
 
-
     objects = UserManager()
 
     USERNAME_FIELD = "email"

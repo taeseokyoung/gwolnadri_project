@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from taggit.serializers import TagListSerializerField, TaggitSerializer
 from .models import Store, Hanbok, HanbokComment, PurchaseRecord
 import requests, json
 import os

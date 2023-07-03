@@ -131,6 +131,7 @@ class UpdateProfileView(generics.UpdateAPIView):
     #     return Response({"message": "회원 탈퇴 완료"}, status=status.HTTP_204_NO_CONTENT)
 
 
+
 # 비밀번호 변경
 class ChangePasswordView(generics.UpdateAPIView):
     queryset = User.objects.all()
@@ -139,11 +140,8 @@ class ChangePasswordView(generics.UpdateAPIView):
 
 
 # KAKAO Login
-BASE_URL = os.environ.get("BASE_URL")
-FRONT_URL = os.environ.get("FRONT_URL")
-
-KAKAO_CALLBACK_URI = BASE_URL + "users/kakao/login/callback/"
-KAKAO_REDIRECT_URI = FRONT_URL + "kakao.html"
+KAKAO_CALLBACK_URI = os.environ.get("KAKAO_CALLBACK_URI")
+KAKAO_REDIRECT_URI = os.environ.get("KAKAO_REDIRECT_URI")
 
 
 class KakaoCallbackView(APIView):
@@ -175,11 +173,11 @@ class KakaoCallbackView(APIView):
         # profile = kakao_account.get("profile")
         # username = profile.get("nickname")
         # profile_image = profile.get("thumbnail_image_url")
-        username = email.split("@")[0]
+        username = kakao_account["email"].split("@")[0]
 
         try:
             user = User.objects.get(email=email)
-            username = email.split("@")[0]
+            user.username = kakao_account["email"].split("@")[0]
             # user.username = username
             # user.profile_image = profile_image
             user.save()
@@ -195,10 +193,10 @@ class KakaoCallbackView(APIView):
 
         except User.DoesNotExist:
             password = User.objects.make_random_password()
-            username = email.split("@")[0]
             user = User.objects.create_user(
                 email=email, password=password, username=username
             )
+            user.username = kakao_account["email"].split("@")[0]
             user.set_unusable_password()
             # user.profile_image = profile_image
             user.save()

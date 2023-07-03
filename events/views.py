@@ -81,7 +81,8 @@ class EventReviewView(APIView):
     serializer_class = EventReviewSerializer
 
     def get(self, request, event_id):
-        review = EventReview.objects.all().order_by().order_by("-created_at")
+        event = get_object_or_404(Event, id=event_id)
+        review = EventReview.objects.filter(event=event).order_by("-created_at")
         serializer = EventReviewSerializer(review, many=True)
         return Response(
             serializer.data,
