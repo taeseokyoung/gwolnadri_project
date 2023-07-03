@@ -5,6 +5,7 @@ import requests, json
 import os
 import environ
 from django.db.models import Avg
+from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 
 # ✅ 위치정보 api

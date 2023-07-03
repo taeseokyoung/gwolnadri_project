@@ -10,11 +10,10 @@ env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
-DEBUG = os.environ.get("DEBUG", "0") == "1"
-ALLOWED_HOSTS = [
-    "backend",
-]
 
+DEBUG = True
+
+# Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -49,7 +48,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
-    # "django.middleware.csrf.CsrfViewMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -166,12 +165,12 @@ SIMPLE_JWT = {
 }
 
 
-CORS_ORIGIN_WHITELIST = [
-    "https://gwolnadri.netlify.app",
-    "https://gwolnadri.online",
-]
+# CORS_ORIGIN_WHITELIST = [
+#     "https://gwolnadri.netlify.app",
+#     "https://gwolnadri.online",
+# ]
 
-CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
+# CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 
 SITE_ID = 1
 ACCOUNT_AUTHENTICATION_METHOD = "email"
