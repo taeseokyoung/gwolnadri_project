@@ -31,9 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password2"]:
-            raise serializers.ValidationError(
-                {"password": "Password fields didn't match."}
-            )
+            raise serializers.ValidationError({"password": "비밀번호가 불일치합니다."})
         return attrs
 
     def create(self, validated_data):
@@ -46,7 +44,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-# 로그인용
+# 로그인 토큰
 class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -75,18 +73,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "bookmark_stores",
             "bookmark_events",
         )
-
-    # event_review = serializers.SerializerMethodField()
-    # hanbok_review = serializers.SerializerMethodField()
-
-    # #게시글 목록
-    # def my_hanbok_reviews(self, obj):
-    #     hanbok_reviews = HanbokReview.objects.filter(user=obj)
-    #     return HanbokReviewSerializer(hanbok_reviews, many=True).data
-    #
-    # def my_event_reviews(self, obj):
-    #     event_reviews = EventReview.objects.filter(user=obj)
-    #     return EventReviewSerializer(event_reviews, many=True).data
 
 
 # 회원정보 수정

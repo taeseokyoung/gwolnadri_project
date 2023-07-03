@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from taggit.serializers import TagListSerializerField, TaggitSerializer
 from .models import Store, Hanbok, HanbokComment, PurchaseRecord
 import requests, json
 import os
@@ -19,10 +20,11 @@ def get_location(address):
 
 
 # ✅ 한복집 리스트 (id, 판매자, 가게이름, 가게주소, x좌표, y좌표, 전체 좋아요 수, 평균 별점, 북마크)
-class StoreListSerializer(serializers.ModelSerializer):
+class StoreListSerializer(TaggitSerializer, serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     total_likes = serializers.SerializerMethodField()
     avg_stars = serializers.SerializerMethodField()
+    tags = TagListSerializerField()
 
     def get_owner(self, obj):
         return obj.owner.id
@@ -48,16 +50,20 @@ class StoreListSerializer(serializers.ModelSerializer):
             "total_likes",
             "avg_stars",
             "store_bookmarks",
+            "tags",
         )
 
 
 # ✅ 한복집 추가 (가게이름, 가게주소)
-class CreateStoreSerializer(serializers.ModelSerializer):
+class CreateStoreSerializer(TaggitSerializer, serializers.ModelSerializer):
+    tags = TagListSerializerField()
+
     class Meta:
         model = Store
         fields = (
             "store_name",
             "store_address",
+            "tags",
         )
 
     # ✅ 한복집 x,y좌표 | 별점(후기없는경우 0) 추가
