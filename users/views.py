@@ -1,25 +1,14 @@
 import os
 import requests
 import random, string
-from django.http import HttpResponse
 from django.http import JsonResponse
-from json.decoder import JSONDecodeError
 from rest_framework import status, permissions, generics
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.decorators import api_view
-from rest_framework.generics import get_object_or_404
-from django.shortcuts import redirect, get_object_or_404
 
-from dj_rest_auth.registration.views import SocialLoginView
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from allauth.socialaccount.providers.google import views as google_view
-from allauth.socialaccount.providers.kakao import views as kakao_view
-from allauth.socialaccount.providers.naver import views as naver_view
-from allauth.socialaccount.models import SocialAccount
 
 from .models import User
 from .serializers import (
@@ -170,16 +159,16 @@ class KakaoCallbackView(APIView):
                 {"err_msg": "카카오 이메일을 가져오지 못했습니다."}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        # profile = kakao_account.get("profile")
-        # username = profile.get("nickname")
-        # profile_image = profile.get("thumbnail_image_url")
-        username = kakao_account["email"].split("@")[0]
+        random_string = ""
+        random_number = random.randint(0, 9999)
+        for i in range(3):
+            random_string += str(random.choice(string.ascii_letters + str(random_number)))
+
+        username = "kakao_" + random_string
 
         try:
             user = User.objects.get(email=email)
-            user.username = kakao_account["email"].split("@")[0]
-            # user.username = username
-            # user.profile_image = profile_image
+            user.username = username
             user.save()
             refresh = RefreshToken.for_user(user)
             refresh["email"] = user.email
@@ -196,9 +185,8 @@ class KakaoCallbackView(APIView):
             user = User.objects.create_user(
                 email=email, password=password, username=username
             )
-            user.username = kakao_account["email"].split("@")[0]
+            user.username = username
             user.set_unusable_password()
-            # user.profile_image = profile_image
             user.save()
             refresh = RefreshToken.for_user(user)
             refresh["email"] = user.email
