@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from users.models import User
+from .throttling import ObjectThrottle
 from .models import Store, Hanbok, HanbokComment, PurchaseRecord
 from .serializers import (
     StoreListSerializer,
@@ -109,6 +110,7 @@ class StoreDetailView(APIView):
 
 class CommentView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    throttle_classes = [ObjectThrottle]
 
     def get(self, request, store_id):
         """

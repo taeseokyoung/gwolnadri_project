@@ -4,8 +4,8 @@ from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from events.models import Event, EventReview, Ticket, TicketBooking, EventList
+from stores.throttling import ObjectThrottle
 from django.db.models import F, Q
-from rest_framework import filters
 from events.permissons import CustomPermission, IsOwnerOrReadOnly
 from events.serializers import (
     EventCreateSerializer,
@@ -82,6 +82,7 @@ class EventDetailView(APIView):
 
 class EventReviewView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    throttle_classes = [ObjectThrottle]
     serializer_class = EventReviewSerializer
 
     def get(self, request, event_id):
