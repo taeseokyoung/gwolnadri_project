@@ -4,6 +4,7 @@ from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from events.models import Event, EventReview, Ticket, TicketBooking, EventList
+from django.db.models import F, Q
 from rest_framework import filters
 from events.permissons import CustomPermission, IsOwnerOrReadOnly
 from events.serializers import (
@@ -28,13 +29,17 @@ class EventListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class EventSearchView(APIView):
+    def get(self, request):
+        event = Event.objects.all().order_by("-created_at")
+        search = request.GET.get("title", "")
+        search_list = event.filter(Q(title__icontains=search))
+        serializer = EventListSerializer(search_list, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class EventView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, CustomPermission]
-    serializer_class = EventListSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = [
-        "title",
-    ]
 
     def get(self, request):
         event = Event.objects.all().order_by("-created_at")
@@ -45,7 +50,6 @@ class EventView(APIView):
         serializer = EventCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(author=request.user)
-
             return Response({"message": "작성완료"})
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -186,6 +190,7 @@ class TicketDateDetailView(APIView):
 
     def get(self, request, event_id, event_date):
         ticket = Ticket.objects.filter(event=event_id, event_date=str(event_date))
+        # ).exclude(current_booking=F("max_booking_count"))
         serializer = TicketSerializer(ticket, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
