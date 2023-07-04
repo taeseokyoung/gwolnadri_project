@@ -2,18 +2,21 @@ from rest_framework import serializers
 from events.models import Event, EventReview, Ticket, TicketBooking, EventList
 from users.models import User
 from datetime import datetime
+from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 
 class EventScrapSerializer(serializers.ModelSerializer):
     """
     크롤링한 공연정보를 보여주는 시리얼라이저입니다.
     """
+
     class Meta:
         model = EventList
         fields = "__all__"
 
 
 class EventCreateSerializer(serializers.ModelSerializer):
+    tags = TagListSerializerField()
     """
     공연정보를 작성하기 위해 사용합니다.
     title (varchar),
@@ -38,6 +41,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
             "time_slots",
             "max_booking",
             "money",
+            "tags",
         )
 
 
@@ -50,6 +54,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     likes_count = serializers.SerializerMethodField()
     author = serializers.SerializerMethodField()
+    tags = TagListSerializerField()
 
     def get_author(self, obj):
         author = obj.author.email.split("@")[0]
@@ -80,10 +85,13 @@ class EventSerializer(serializers.ModelSerializer):
             "review_count",
             "likes_count",
             "event_bookmarks",
+            "tags",
         )
 
 
 class EventListSerializer(EventSerializer):
+    tags = TagListSerializerField()
+
     class Meta:
         model = Event
         fields = (
@@ -96,6 +104,7 @@ class EventListSerializer(EventSerializer):
             "likes",
             "likes_count",
             "event_bookmarks",
+            "tags",
         )
 
 

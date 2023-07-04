@@ -1,6 +1,12 @@
 from django.db import models
+from taggit.managers import TaggableManager
 from users.models import User
 from django.core.validators import MinValueValidator
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+    description = models.CharField(max_length=200, null=True, blank=True)
 
 
 class Event(models.Model):
@@ -10,15 +16,20 @@ class Event(models.Model):
     image = models.ImageField(blank=True, upload_to="%Y/%m/")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    event_start_date = models.DateTimeField()
-    event_end_date = models.DateTimeField()
-    time_slots = models.JSONField()
-    max_booking = models.PositiveIntegerField(validators=[MinValueValidator(1)])
-    money = models.IntegerField()
+    event_start_date = models.DateTimeField(null=True)
+    event_end_date = models.DateTimeField(null=True)
+    time_slots = models.JSONField(null=True)
+    max_booking = models.PositiveIntegerField(
+        validators=[MinValueValidator(1)], null=True
+    )
+    money = models.IntegerField(null=True)
     likes = models.ManyToManyField(User, related_name="like_event", blank=True)
     event_bookmarks = models.ManyToManyField(
         User, related_name="bookmark_events", blank=True
     )
+    tags = TaggableManager(blank=True)
+    event_category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
 
 class EventList(models.Model):
     title = models.CharField(max_length=50)
@@ -45,11 +56,11 @@ class TicketBooking(models.Model):
     money(int): 티켓의 가격을 표현합니다.
     quantity(int): 구입할 수량을 표현합니다
     """
+
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
     money = models.IntegerField()
     quantity = models.IntegerField(default=0)
-
 
 
 class EventReview(models.Model):
@@ -64,7 +75,7 @@ class EventReview(models.Model):
     event = models.ForeignKey(
         Event, on_delete=models.CASCADE, related_name="review_set"
     )
-    content = models.TextField()
+    content = models.TextField(max_length=50)
     review_image = models.ImageField(blank=True, upload_to="%Y/%m/")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
