@@ -130,17 +130,32 @@ class CommentView(APIView):
         """
         한복점 리뷰 작성 로그인한 사람이면 모두 가능
         """
-        comment_serializer = CreateCommentSerializer(data=request.data)
-        if comment_serializer.is_valid():
-            comment_serializer.save(store_id=store_id, user=request.user)
-            return Response(
-                {"message": "후기 추가 완료", "data": comment_serializer.data},
-                status=status.HTTP_200_OK,
-            )
+        user = self.request.user.id
+        purchase_stores = PurchaseRecord.objects.filter(
+            type="hanbok", approved_at__isnull=False, user_id=user
+        )
+        purchase_store_id = list(
+            {
+                int(str(purchase_store.partner_order_id).split("2023")[1])
+                for purchase_store in purchase_stores
+            }
+        )
+        if store_id in purchase_store_id:
+            comment_serializer = CreateCommentSerializer(data=request.data)
+            if comment_serializer.is_valid():
+                comment_serializer.save(store_id=store_id, user=request.user)
+                return Response(
+                    {"message": "후기 추가 완료", "data": comment_serializer.data},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"message": f"${comment_serializer.errors}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
             return Response(
-                {"message": f"${comment_serializer.errors}"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"message": "구매 기록이 없습니다"}, status=status.HTTP_403_FORBIDDEN
             )
 
 
@@ -312,17 +327,6 @@ class HanbokPurchaseRecordView(APIView):
 # 행사 예약 결제 리스트 조회
 class EventPurchaseRecordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request, user_id):
-        user = get_object_or_404(User, id=user_id)
-        if request.user == user:
-            complete = PurchaseRecord.objects.filter(
-                user_id=user_id, approved_at__isnull=False, type="event"
-            ).order_by("rsrvt_date")
-            serializer = PurchaseRecordSerializer(complete, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"message": "권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
     def get(self, request, user_id):
         user = get_object_or_404(User, id=user_id)
