@@ -24,15 +24,13 @@
 
 <br>
 
-### 와이어프레임
+### [와이어프레임](https://www.figma.com/community/file/1259502689154231811)
 
-<a href="https://ibb.co/bJG3m3L"><img src="https://i.ibb.co/M6JhShp/Wireframe.png" alt="Wireframe" border="0" style="width:100%"></a>
+<a href="https://ibb.co/bJG3m3L"><img src="https://i.ibb.co/M6JhShp/Wireframe.png" alt="Wireframe" border="0"></a>
 
 <br>
 
 ## 궐나드리 기술 정보
-
-<br>
 
 ### 프로젝트 상태
 버전별로 업데이트 상황이 궁금하시면 브랜치를 이동해주세요.
@@ -43,15 +41,15 @@
 
 <br>
 
-### ERD
+### [ERD](https://www.erdcloud.com/d/Y2SsEs8rp7MNxqHim)
 
-<a href="https://ibb.co/hRySzSp"><img src="https://i.ibb.co/VWts4sX/erd.png" alt="erd" border="0" style="width:100%"></a>
+<a href="https://ibb.co/hRySzSp"><img src="https://i.ibb.co/VWts4sX/erd.png" alt="erd" border="0"></a>
 
 <br>
 
 ### 서비스 아키텍쳐
 
-<a href="https://ibb.co/G73z1kG"><img src="https://i.ibb.co/XXkcdp6/service.png" alt="service" border="0" style="width:100%"></a>
+<a href="https://ibb.co/G73z1kG"><img src="https://i.ibb.co/XXkcdp6/service.png" alt="service" border="0"></a>
 
 <br>
 
