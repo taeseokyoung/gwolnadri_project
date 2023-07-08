@@ -6,7 +6,9 @@
 <a href="https://ibb.co/PWMP2f7"><img src="https://i.ibb.co/s1CNTM0/readme.png" alt="readme" border="0" style="width:100%"></a>
 <br>
   
-##  🇰🇷 궐나드리 기획의도
+
+## <img src="https://i.ibb.co/PY4Qxbd/kr.jpg" alt="kr" border="0" width="40px" style="top:5px;position:relative;">궐나드리 기획의도
+
 > 궁궐 행사 정보와 예매 서비스의 접근성 부족을 인식. 한복을 입고 궁궐 나들이를 계획하시는 분들이 보다 편하게 이용하실 수 있는 서비스를 계획하였습니다. 행사 안내와 예매, 한복점 찾기, 한복 예약까지! 궁궐 관람하시는 분들을 위한 맞춤 서비스를 제공합니다.
 
 <div align="right" style="text-align:right;">
@@ -54,6 +56,8 @@
 <br>
 
 ## 프로젝트 스택
+[💻 requirements.txt 바로가기](https://github.com/taeseokyoung/gwolnadri_project/blob/develop/requirements.txt)
+
 ### Environment
 <img src="https://img.shields.io/badge/VScode-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white"> <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white"> <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white">
 
