@@ -94,16 +94,22 @@ class EventReviewView(APIView):
             status=status.HTTP_200_OK,
         )
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, event_id):
         serializer = EventReviewCreateSerializer(
             data=request.data, context={"request": request}
         )
-        event = get_object_or_404(Event, id=kwargs.get("event_id"))
-        if serializer.is_valid():
-            serializer.save(author=request.user, event=event)
-            return Response({"message": "작성완료"}, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        event = get_object_or_404(Event, id=event_id)
+        ticket_bookings = TicketBooking.objects.filter(
+            ticket__event_id=event_id, author=request.user
+        )
+        if ticket_bookings.exists():
+            if serializer.is_valid():
+                serializer.save(author=request.user, event=event)
+                return Response({"message": "작성완료"}, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"message": "구매 기록이 없습니다"}, status=status.HTTP_403_FORBIDDEN)
 
 
 class EventReviewDetailView(APIView):
