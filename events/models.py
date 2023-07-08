@@ -1,6 +1,9 @@
 from django.db import models
 from users.models import User
 from django.core.validators import MinValueValidator
+from datetime import timedelta
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Event(models.Model):
@@ -19,6 +22,33 @@ class Event(models.Model):
     event_bookmarks = models.ManyToManyField(
         User, related_name="bookmark_events", blank=True
     )
+
+
+@receiver(post_save, sender=Event)
+def create_tickets(sender, instance, created, **kwargs):
+    if created:
+        event_start_date = instance.event_start_date.date()
+        event_end_date = instance.event_end_date.date()
+        time_slots = instance.time_slots
+        current_date = event_start_date
+        while current_date <= event_end_date:
+            for time_slot_key, time_slot_value in time_slots.items():
+                # Create a ticket for each time slot
+                ticket = Ticket.objects.create(
+                    author=instance.author,
+                    event=instance,
+                    event_date=current_date,
+                    event_time=time_slot_value,
+                    max_booking_count=instance.max_booking,
+                    money=instance.money,
+                    current_booking=0,
+                    quantity=0,
+                )
+                # Additional logic for ticket creation if needed
+                # ...
+
+            current_date += timedelta(days=1)
+
 
 class EventList(models.Model):
     title = models.CharField(max_length=50)
@@ -45,11 +75,11 @@ class TicketBooking(models.Model):
     money(int): 티켓의 가격을 표현합니다.
     quantity(int): 구입할 수량을 표현합니다
     """
+
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
     money = models.IntegerField()
     quantity = models.IntegerField(default=0)
-
 
 
 class EventReview(models.Model):
