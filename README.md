@@ -56,18 +56,18 @@
 <br>
 
 ## 프로젝트 스택
-[💻 requirements.txt 바로가기](https://github.com/taeseokyoung/gwolnadri_project/blob/develop/requirements.txt)
+[💻 전체 스택 구경하기](https://github.com/taeseokyoung/gwolnadri_project/blob/develop/requirements.txt)
 
-### Environment
+### 개발환경 | Environment
 <img src="https://img.shields.io/badge/VScode-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white"> <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white"> <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white">
 
-### Config
+### 패키지 관리자 | Config
 <img src="https://img.shields.io/badge/PyPI-3775A9?style=for-the-badge&logo=PyPI&logoColor=white">
 
-### Development
+### 기술 | Development
 <img src="https://img.shields.io/badge/django-092E20?style=for-the-badge&logo=django&logoColor=white"> <img src="https://img.shields.io/badge/JWT-A100FF?style=for-the-badge&logo=jsonwebtokens&logoColor=white"> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white"> <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"> <img src="https://img.shields.io/badge/NGINX-009639?style=for-the-badge&logo=NGINX&logoColor=white"> <img src="https://img.shields.io/badge/Amazon_Aws-232F3E?style=for-the-badge&logo=Amazon Aws&logoColor=white"> <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
 
-### Communication
+### 소통 | Communication
 <img src="https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=Slack&logoColor=white"> <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white">
 
 <br>
@@ -76,7 +76,7 @@
 
 ### 팀원 소개 
 
-- 태서경 [_taeseokyoung](https://github.com/taeseokyoung) : leader | Backend engineer, Project support
+- 태서경 [_taeseokyoung](https://github.com/taeseokyoung) : leader | Backend engineer, Deploy, Project support
 - 이세희 [_BenCyera](https://github.com/BenCyera) : Backend engineer, Payment Part
 - 나지수 [_Ra0ul](https://github.com/Ra0ul) : Backend engineer, Store Part
 - 정찬호 [_Jeongchan-ho](https://github.com/Jeongchan-ho) : Backend engineer, Event Part
@@ -86,6 +86,6 @@
 
 [궐나드리 : Team Notion](https://www.notion.so/1a0780158c574f5fbeea1b4c50bc0a7c?v=76803b80ec9249a9a9b19df2f33eb573)
 
-### 프론트 레포지토리 구경하기
+### 프론트 레포지토리
 
 [궐나드리 : Gwolnadri_front](https://github.com/taeseokyoung/gwolnadri_front)
